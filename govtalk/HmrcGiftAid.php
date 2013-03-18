@@ -163,195 +163,6 @@ EOD;
 		}
 	
 	}
-
-  public function testExampleGiftAidSubmission() {
-    $cSenderId       = '323412300001';
-    $cAuthValue      = 'testing1';
-    $cKeyCharId      = 'AB12345';
-    $cChannelUri     = '2252';
-    $cChannelProduct = 'VedaGiftAidSubmission';
-    $cChannelVersion = '1.0 beta';
-    $cXML            = <<<EOF
-<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
-	<EnvelopeVersion>2.0</EnvelopeVersion>
-	<Header>
-		<MessageDetails>
-			<Class>HMRC-CHAR-CLM</Class>
-			<Qualifier>request</Qualifier>
-			<Function>submit</Function>
-			<CorrelationID/>
-			<Transformation>XML</Transformation>
-			<GatewayTest>1</GatewayTest>
-      <GatewayTimestamp></GatewayTimestamp>             
-		</MessageDetails>
-		<SenderDetails>
-			<IDAuthentication>
-				<SenderID>$cSenderId</SenderID>
-				<Authentication>
-					<Method>clear</Method>
-					<Role>principal</Role>
-					<Value>$cAuthValue</Value>
-				</Authentication>
-			</IDAuthentication>
-		</SenderDetails>
-	</Header>
-	<GovTalkDetails>
-		<Keys>
-			<Key Type="CHARID">$cKeyCharId</Key>
-		</Keys>
-		<TargetDetails>
-			<Organisation>IR</Organisation>
-		</TargetDetails>
-		<ChannelRouting>
-			<Channel>
-				<URI>$cChannelUri</URI>
-				<Product>$cChannelProduct</Product>
-				<Version>$cChannelVersion</Version>
-			</Channel>
-		</ChannelRouting>
-	</GovTalkDetails>
-	<Body>
-		<IRenvelope xmlns="http://www.govtalk.gov.uk/taxation/charities/r68/1">
-			<IRheader>
-				<Keys>
-					<Key Type="CHARID">$cKeyCharId</Key>
-				</Keys>
-				<PeriodEnd>2012-10-31</PeriodEnd>
-				<DefaultCurrency>GBP</DefaultCurrency>
-				<IRmark Type="generic">ymFYM1StJ3IbfyieQuJ04tPXOBY=</IRmark>
-				<Sender>Individual</Sender>
-			</IRheader>
-			<R68>
-				<AuthOfficial>
-					<OffName>
-						<Fore>John</Fore>
-						<Sur>Smith</Sur>
-					</OffName>
-					<OffID>
-						<Postcode>AB12 3CD</Postcode>
-					</OffID>
-					<Phone>01234 567890</Phone>
-				</AuthOfficial>
-				<Declaration>yes</Declaration>
-				<Claim>
-					<OrgName>My Organisation</OrgName>
-					<HMRCref>AA12345</HMRCref>
-					<Regulator>
-						<RegName>CCEW</RegName>
-						<RegNo>A1234</RegNo>
-					</Regulator>
-					<Repayment>
-						<GAD>
-							<Donor>
-								<Fore>James</Fore>
-								<Sur>Bacon</Sur>
-								<House>55</House>
-								<Postcode>AB23 4CD</Postcode>
-							</Donor>
-							<Date>2012-10-01</Date>
-							<Total>5.00</Total>
-						</GAD>
-						<GAD>
-							<Donor>
-								<Fore>Mary</Fore>
-								<Sur>Jones</Sur>
-								<House>12</House>
-								<Postcode>AB23 9CD</Postcode>
-							</Donor>
-							<Date>2012-10-15</Date>
-							<Total>10.00</Total>
-						</GAD>
-						<GAD>
-							<Donor>
-								<Fore>Bob</Fore>
-								<Sur>Smith</Sur>
-								<House>1</House>
-								<Postcode>BA23 9CD</Postcode>
-							</Donor>
-							<Date>2012-10-03</Date>
-							<Total>2.50</Total>
-						</GAD>
-						<GAD>
-							<Donor>
-								<Fore>Jane</Fore>
-								<Sur>Smith</Sur>
-								<House>1</House>
-								<Postcode>BA23 9CD</Postcode>
-							</Donor>
-							<Date>2012-10-03</Date>
-							<Total>12.00</Total>
-						</GAD>
-						<EarliestGAdate>2012-10-01</EarliestGAdate>
-						<OtherInc>
-							<Payer>Peter Other</Payer>
-							<OIDate>2012-10-31</OIDate>
-							<Gross>13.12</Gross>
-							<Tax>2.62</Tax>
-						</OtherInc>
-					</Repayment>
-					<GASDS>
-						<ConnectedCharities>no</ConnectedCharities>
-						<CommBldgs>no</CommBldgs>
-					</GASDS>
-				</Claim>
-			</R68>
-		</IRenvelope>
-	</Body>
-</GovTalkMessage>            
-EOF;
-    if ($this->sendMessage( $cXML ) && ($this->responseHasErrors() === false)) {
-      $returnable = $this->getResponseEndpoint();
-      $returnable['correlationid'] = $this->getResponseCorrelationId();
-      return $returnable;
-    } else {
-      return false;
-    }    
-  }
-
-  public function testGatewayReflector() {
-    $iChardId              = 'AB12345';
-    $cOrganisation         = 'HMRC';
-    $cClientUri            = '2355';
-    $cClientProduct        = 'VedaGiftAidSubmission';
-    $cClientProductVersion = '1.0 beta';
-
-    // Set the message envelope
-    $this->setMessageClass         ( 'HMRC-CHAR-CLM' );
-    $this->setMessageQualifier     ( 'request'       );
-    $this->setMessageFunction      ( 'submit'        );
-    $this->setMessageCorrelationId (  null           );
-    $this->setMessageTransformation( 'XML'           );
-    $this->addTargetOrganisation   ( $cOrganisation  );
-    
-    $this->addMessageKey( 'CHARID'
-                        , $iChardId
-                        );
-    $this->addChannelRoute( $cClientUri
-                          , $cClientProduct
-                          , $cClientProductVersion 
-                          );
-    // Build message body...
-    $package = new XMLWriter();
-    $package->openMemory();
-    $package->setIndent( true );
-	  // Send the message and deal with the response...
-    $package->startElement( 'BodyText' );
-      $package->writeAttribute( 'xmlns', 'http://vedaconsulting.co.uk' );
-      $package->startElement( 'MyText' );
-        $package->text( 'The Gateway Reflector service cannot validate the data in the body tag so please use LTS.' );
-      $package->endElement(); 
-    $package->endElement(); 
-    
-    $this->setMessageBody( $package );
-
-    if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
-      $returnable = $this->getResponseEndpoint();
-      $returnable['correlationid'] = $this->getResponseCorrelationId();
-      return $returnable;
-    } else {
-      return false;
-    }
-  }
   
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {
     $cDonorSelect = <<<EOD
@@ -463,30 +274,30 @@ EOD;
         $package->startElement('Keys');
           $package->startElement('Key');
             $package->writeAttribute('Type', 'CHARID');
-            $package->text($cChardId);
+            $package->text( $cChardId );
           $package->endElement(); # Key
         $package->endElement(); # Keys
-        $package->writeElement('PeriodEnd', $dReturnPeriod);
+        $package->writeElement('PeriodEnd', $dReturnPeriod );
         $package->writeElement('DefaultCurrency', $sDefaultCurrency );
-        $package->writeElement('IRmark', $dReturnPeriod);
+        $package->writeElement('IRmark', $dReturnPeriod );
           $package->writeAttribute('Type', 'generic');
           $package->text( $sIRmark );
         $package->endElement(); 
-        $package->writeElement('Sender', $sSender);
+        $package->writeElement('Sender', $sSender );
         $package->endElement(); 
       $package->endElement(); #IRheader
       $package->startElement('R68');
         $package->startElement('AuthOfficial');
           $package->startElement('OffName');
-            $package->writeElement( 'Fore', $cAuthOffForename);
-            $package->writeElement( 'Sur' , $cAuthOffSurname);
+            $package->writeElement( 'Fore', $cAuthOffForename );
+            $package->writeElement( 'Sur' , $cAuthOffSurname  );
           $package->endElement(); #OffName
           $package->startElement('OffID');
-            $package->writeElement( 'Postcode', $cAuthOffPostcode);
+            $package->writeElement( 'Postcode', $cAuthOffPostcode );
           $package->endElement(); #OffID
-          $package->writeElement( 'Phone', $cAuthOffPhone);        
+          $package->writeElement( 'Phone', $cAuthOffPhone );        
         $package->endElement(); #AuthOfficial
-        $package->writeElement( 'Declaration', $cDeclaration);        
+        $package->writeElement( 'Declaration', $cDeclaration );        
         $this->build_claim_xml( $pBatchId, $package );
       $package->endElement(); #R68
     $package->endElement(); #IRenvelope

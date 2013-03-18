@@ -1,22 +1,22 @@
 <?xml version='1.0' encoding='UTF-8' ?> 
 <extension key="uk.co.vedaconsulting.module.giftaidonline" type="module">
-  <downloadUrl>http://www.vedaconsulting.co.uk/uk-hrmc-gift-aid-online-submission/download</downloadUrl>
+  <downloadUrl>https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/archive/v1.0.0.zip</downloadUrl>
   <file>giftaidonline</file>
   <name>Online Gift Aid Submission</name>
   <description>Allows online submission to the HMRC Charities online toolkit</description>
   <urls>
-    <url desc="Main Extension Page">http://civicrm.org</url>
+    <url desc="Main Extension Page">http://civicrm.org/extensions/uk-hmrc-online-gift-aid-submission</url>
     <url desc="Documentation">http://www.vedaconsulting.co.uk/uk-hrmc-gift-aid-online-submission/</url>
     <url desc="Support">http://forum.civicrm.org</url>
     <url desc="Licensing">http://civicrm.org/licensing</url>
   </urls>
   <license>AGPL</license>
   <maintainer>
-    <author>Parvez Saleh &amp; Long Luong</author>
-    <email>parvez@vedaconsulting.co.uk;long@vedaconsulting.co.uk</email>
+    <author>Parvez Saleh</author>
+    <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
   <releaseDate>2013-03-18</releaseDate>
-  <version>1.0</version>
+  <version>v1.0.0</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.2</ver>

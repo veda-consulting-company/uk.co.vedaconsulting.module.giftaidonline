@@ -72,9 +72,7 @@ class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
   
 
   function is_submitted( $pBatchId )   {
-    
-    return FALSE;
-    
+        
     $bIsSubmitted = null;
     $cQuery = " SELECT submission.batch_id                    AS batch_id " .
               " ,      submission.response_status             AS status   " .

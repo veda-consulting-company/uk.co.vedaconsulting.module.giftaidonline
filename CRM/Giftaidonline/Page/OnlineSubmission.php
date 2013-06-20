@@ -66,7 +66,8 @@ class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
       $cType    = 'error';
     }
     
-    drupal_set_message( $cMessage, $cType );
+      CRM_Core_Session::setStatus( $cMessage , '' , $cType );
+
   }
   
 
@@ -91,7 +92,7 @@ class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
   
   function submit_batch ( $pBatchId )   {
     if ( $this->is_submitted( $pBatchId ) ) {
-      drupal_set_message( 'This Batch has already been submitted.' );
+      CRM_Core_Session::setStatus('This Batch has already been submitted.' );
       return array();
     }
    

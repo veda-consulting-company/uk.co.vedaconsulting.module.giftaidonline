@@ -4,7 +4,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 , `description`
 ) VALUES 
 ( 'VENDOR_ID'
-, null
+, '2355'
 , 'The Vendor Id credential for communicating with HRMCR Gateway'
 );
 
@@ -15,7 +15,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'SENDER_ID'
 , null
-, 'The Sender Id credential for communicating with HRMCR Gateway'
+, 'Your HMRC User ID (SDS Reference is Sender ID)'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 
@@ -25,7 +25,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'SENDER_VALUE'
 , null
-, 'The Sender Value credential for communicating with HRMCR Gateway'
+, 'Your HMRC User Password (SDS Reference is Sender Value)'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 

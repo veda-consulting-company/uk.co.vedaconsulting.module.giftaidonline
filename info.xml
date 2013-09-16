@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?> 
 <extension key="uk.co.vedaconsulting.module.giftaidonline" type="module">
-  <downloadUrl>https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/archive/v1.0.0.zip</downloadUrl>
+  <downloadUrl>https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/archive/v1.1.0.zip</downloadUrl>
   <file>giftaidonline</file>
   <name>Online Gift Aid Submission</name>
   <description>Allows online submission to the HMRC Charities online toolkit</description>
@@ -16,12 +16,12 @@
     <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
   <releaseDate>2013-03-18</releaseDate>
-  <version>v1.0.0</version>
+  <version>v1.1.0</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.2</ver>
+    <ver>4.2, 4.3</ver>
   </compatibility>
-  <comments>This is a very early release and is still under active development.</comments>
+  <comments>Beta Release, please confirm the receipt of the submission with the HMRC</comments>
   <civix>
     <namespace>CRM/Giftaidonline</namespace>
   </civix>

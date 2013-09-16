@@ -77,3 +77,73 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 , null
 , 'The Regulator Number belonging the Claiment organisation'
 );
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'MODE'
+, 'live'
+, 'Are we in Live or Dev Mode'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'PERIOD_END'
+, '2013-03-31'
+, 'The period end date of the current claim (set to YYYY-DD-MM format)'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'SENDER_TYPE'
+, 'Individual'
+, 'Should be either Individual or Organisation'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'AUTH_OFF_SURNAME'
+, ''
+, 'Surname of the Authorising Officer for your organisation'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'AUTH_OFF_FORENAME'
+, ''
+, 'Forename of the Authorising Officer for your organisation'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'AUTH_OFF_PHONE'
+, ''
+, 'Phone Number of the Authorising Officer for your organisation'
+);
+
+INSERT INTO `civicrm_gift_aid_submission_setting` 
+( `name`
+, `value`
+, `description`
+) VALUES 
+( 'AUTH_OFF_POSTCODE'
+, ''
+, 'Postcode of the Authorising Officer for your organisation e.g. EC2A 3AY'
+);

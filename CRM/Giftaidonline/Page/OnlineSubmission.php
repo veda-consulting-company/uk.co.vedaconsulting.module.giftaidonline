@@ -4,12 +4,6 @@ require_once 'CRM/Core/Page.php';
 require_once ( dirname(__FILE__) . '/../../../govtalk/HmrcGiftAid.php'  );
 
 class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
-  private function _get_hmrcUserId() {
-    return '323412300001';
-  }
-  private function _get_hmrcPassword() {
-    return 'testing1';
-  }
   
   function _get_batch_record_sql ( $pBatchId = null ) {
     $cWhere = empty( $pBatchId ) ? null : ' AND batch.id = ' . $pBatchId;
@@ -33,10 +27,7 @@ class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
   function get_submission_status ( $pEndpoint, $pCorrelation )  {
     $cType = 'status';
     if ( isset( $pEndpoint ) && isset( $pCorrelation )) {
-      $oHmrcGiftAid = new HmrcGiftAid( $this->_get_hmrcUserId()
-                                     , $this->_get_hmrcPassword()
-                                     , 'dev'
-                                     );
+      $oHmrcGiftAid = new HmrcGiftAid();
       $pollResponse = $oHmrcGiftAid->declarationResponsePoll( $pCorrelation
                                                             , $pEndpoint 
                                                             ); 
@@ -94,27 +85,9 @@ class CRM_Giftaidonline_Page_OnlineSubmission extends CRM_Core_Page {
       return array();
     }
    
-    $oHmrcGiftAid    = new HmrcGiftAid( $this->_get_hmrcUserId()
-                                      , $this->_get_hmrcPassword()
-                                      , 'dev'
-                                      );
-//    $pollRequest     = $oHmrcGiftAid->declarationRequest( $vatNumber         = 999900001
-//                                                        , $returnPeriod      = '2009-01'
-//                                                        , $senderCapacity    = 'Individual'
-//                                                        , $vatOutput         = 6035.33
-//                                                        , $vatECAcq          = 0.00
-//                                                        , $vatReclaimedInput = 'disabled'
-//                                                        , $netOutput         = 84.75
-//                                                        , $netInput          = 'disabled'
-//                                                        , $netECSupply       = 40235.35
-//                                                        , $netECAcq          = 993.54
-//                                                        , $totalVat          = 0.0
-//                                                        , $netVat            = 0.0
-//                                                        , $finalReturn       = false
-//                                                        );
-//    $pollRequest     = $oHmrcGiftAid->testGatewayReflector();
-//    $pollRequest     = $oHmrcGiftAid->testExampleGiftAidSubmission();
-    $pollRequest     = $oHmrcGiftAid->giftAidSubmit( $pBatchId );
+    $oHmrcGiftAid    = new HmrcGiftAid();
+
+		$pollRequest     = $oHmrcGiftAid->giftAidSubmit( $pBatchId );
     $cStatusMessage  = null;
     if ( $pollRequest ) {
       $cStatusMessage = sprintf( 'Return successfully submitted.<br /><a href="submit-poll.php?endpoint=%s&correlation=%s">Poll for HMRC response.</a>'

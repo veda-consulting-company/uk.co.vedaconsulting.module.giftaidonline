@@ -69,8 +69,21 @@ class HmrcGiftAid extends GiftAidGovTalk {
 	 * @param string $govTalkPassword GovTalk password.
 	 * @param string $service The service to use ('dev', or 'live').
 	 */
-	public function __construct( $govTalkSenderId, $govTalkPassword, $service = 'live' ) {
-		switch ($service) {
+	public function __construct() {
+    $cSettingsSelect = <<<EOD
+      SELECT setting.name                                    AS name
+      ,      setting.value                                   AS value       
+      FROM   civicrm_gift_aid_submission_setting setting                                    
+EOD;
+    $oDao = CRM_Core_DAO::executeQuery( $cSettingsSelect, array() );    
+    while ( $oDao->fetch() ) {
+      $this->_Settings[$oDao->name] = $oDao->value;
+    }
+		
+		$govTalkSenderId = $this->_Settings['SENDER_ID'];
+		$govTalkPassword = $this->_Settings['SENDER_VALUE'];
+		
+		switch ($this->_Settings['MODE']) {
 			case 'dev':
 				parent::__construct( 'https://secure.dev.gateway.gov.uk/submission'
                            , $govTalkSenderId
@@ -84,16 +97,6 @@ class HmrcGiftAid extends GiftAidGovTalk {
                            , $govTalkPassword
                            );
 			break;
-    }
-    
-    $cSettingsSelect = <<<EOD
-      SELECT setting.name                                    AS name
-      ,      setting.value                                   AS value       
-      FROM   civicrm_gift_aid_submission_setting setting                                    
-EOD;
-    $oDao = CRM_Core_DAO::executeQuery( $cSettingsSelect, array() );    
-    while ( $oDao->fetch() ) {
-      $this->_Settings[$oDao->name] = $oDao->value;
     }
 		
 		$this->setMessageAuthentication( 'clear' );
@@ -237,15 +240,15 @@ EOD;
     $cOrganisation         = 'IR';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
-    $cClientProductVersion = '1.0 beta';
-    $dReturnPeriod         = '2013-03-31';
+    $cClientProductVersion = '1.1 beta';
+    $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
     $sIRmark               = 'ymFYM1StJ3IbfyieQuJ04tPXOBY';
-    $sSender               = 'Individual';
-    $cAuthOffSurname       = 'Smith';
-    $cAuthOffForename      = 'John';
-    $cAuthOffPhone         = '';
-    $cAuthOffPostcode      = 'AB12 3CD';
+    $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';
+    $cAuthOffSurname       = $this->_Settings['AUTH_OFF_SURNAME']; //'Smith';
+    $cAuthOffForename      = $this->_Settings['AUTH_OFF_FORENAME']; //'John';
+    $cAuthOffPhone         = $this->_Settings['AUTH_OFF_PHONE']; //'';
+    $cAuthOffPostcode      = $this->_Settings['AUTH_OFF_POSTCODE']; //'AB12 3CD';
     $cDeclaration          = 'yes';
     
     // Set the message envelope

@@ -35,7 +35,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'CHAR_ID'
 , null
-, 'The Charitity Id credential for communicating with HRMCR Gateway'
+, 'The Charitity Id credential for communicating with HRMCR Gateway. This is the XR number you would have been supplied by the HMRC.'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 
@@ -55,7 +55,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'CLAIMER_ORG_HMRC_REF'
 , null
-, 'The HMRC Refence of the Organisation that is submitting the claim'
+, 'The Charitity Id credential for communicating with HRMCR Gateway. This is the XR number you would have been supplied by the HMRC. Same value as CHAR_ID.'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 
@@ -65,7 +65,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'CLAIMER_ORG_REGULATOR_NAME'
 , null
-, 'The name of the Regulator belonging the Claiment organisation'
+, 'Abbereviated name of the Regulator belonging the Claiment organisation, for example Charity Comission of England and Wales is CCEW.'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 

@@ -21,10 +21,10 @@
   <compatibility>
     <ver>4.2</ver>
 	  <ver>4.3</ver>
-	</ver>
   </compatibility>
   <comments>Beta Release, please confirm the receipt of the submission with the HMRC</comments>
   <civix>
     <namespace>CRM/Giftaidonline</namespace>
   </civix>
 </extension>
+ension>

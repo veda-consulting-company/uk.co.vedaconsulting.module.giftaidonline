@@ -74,5 +74,5 @@ function giftaidonline_civicrm_managed(&$entities) {
  * @param array $params
  */
 function giftaidonline_civicrm_navigationMenu( &$params ) {
-  return _giftaidonline_civicrm_navigationMenu( &$params );
+  return _giftaidonline_civicrm_navigationMenu( $params );
 }

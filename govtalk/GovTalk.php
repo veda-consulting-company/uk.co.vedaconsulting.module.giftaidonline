@@ -283,7 +283,7 @@ class GovTalk {
 	public function getResponseQualifier() {
 
 		if (isset($this->_fullResponseObject)) {
-			return (string) $this->_fullResponseObject->Header->MessageDetails->Qualifer;
+			return (string) $this->_fullResponseObject->Header->MessageDetails->Qualifier;
 		} else {
 			return false;
 		}
@@ -401,7 +401,7 @@ class GovTalk {
 	}
 
  /* General envelope related set methods. */
- 
+
 	/**
 	 * Change the URL used to talk to the Government Gateway from that set during
 	 * the instance instantiation. Very handy when required to poll a different
@@ -410,9 +410,9 @@ class GovTalk {
 	 * @param string $govTalkServer GovTalk server URL.
 	 */
 	public function setGovTalkServer($govTalkServer) {
-	
+
 		$this->_govTalkServer = $govTalkServer;
-	
+
 	}
 
 	/**
@@ -439,7 +439,7 @@ class GovTalk {
 		}
 
 	}
-	
+
 	/**
 	 * Switch off (or on) schema validation of outgoing and incoming XML data
 	 * against the additional XML schema.
@@ -448,14 +448,14 @@ class GovTalk {
 	 * @return boolean True if the validation is set, false if setting the validation failed.
 	 */
 	public function setSchemaValidation($validate) {
-	
+
 		if (is_bool($validate)) {
 			$this->_schemaValidation = $validate;
 			return true;
 		} else {
 			return false;
 		}
-	
+
 	}
 
 	/**
@@ -849,7 +849,7 @@ class GovTalk {
 		return true;
 
 	}
-	
+
  /* Specific generic Gateway requests. */
 
 	/**
@@ -863,7 +863,7 @@ class GovTalk {
 	 * @return boolean True if message was successfully deleted from the gateway, false otherwise.
 	 */
 	public function sendDeleteRequest($correlationId = null, $messageClass = null) {
-	
+
 		if (($correlationId !== null) && ($messageClass !== null)) {
 			if (preg_match('/[0-9A-F]{0,32}/', $correlationId)) {
 				$correlationId = $correlationId;
@@ -878,19 +878,19 @@ class GovTalk {
 				return false;
 			}
 		}
-		
+
 		$this->setMessageClass($messageClass);
 		$this->setMessageQualifier('request');
 		$this->setMessageFunction('delete');
 		$this->setMessageCorrelationId($correlationId);
 		$this->setMessageBody('');
-		
+
 		if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
 			return true;
 		} else {
 			return false;
 		}
-	
+
 	}
 
  /* Message sending related methods. */
@@ -908,17 +908,18 @@ class GovTalk {
 	 * @param mixed
 	 * @return boolean True if the message was successfully submitted to the Gateway and a response was received, false if not.
 	 */
-	public function sendMessage( $cRequestString = null ) {
-		if ( !empty( $cRequestString )) {
-      $this->_fullRequestString = $cRequestString;
+	public function sendMessage( $p_request_string = null ) {
+		if ( !empty( $p_request_string ) ) {
+      $this->_fullRequestString = $p_request_string;
     } else {
       $this->_fullRequestString = $this->_packageGovTalkEnvelope();
     }
     if ( $this->_fullRequestString ) {
 			$this->_fullResponseString = $this->_fullResponseObject = null;
-    
+
       if (function_exists('curl_init')) {
 				$curlHandle = curl_init($this->_govTalkServer);
+
 				curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
 				curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, false);
@@ -935,7 +936,7 @@ class GovTalk {
 					return false;
 				}
 			}
-			
+
 			if ($gatewayResponse !== false) {
 				$this->_fullResponseString = $gatewayResponse;
 				$validXMLResponse = false;
@@ -984,7 +985,7 @@ class GovTalk {
 	   return false;
 
 	}
-	
+
 	/**
 	 * This method is designed to be over-ridden by extending classes which
 	 * require the final XML package to be digested (and, perhaps, altered) in
@@ -998,9 +999,9 @@ class GovTalk {
 	 * @return string The new (or unaltered) package after application of the digest.
 	 */
 	protected function packageDigest($package) {
-	
+
 		return $package;
-	
+
 	}
 
 	/**
@@ -1046,10 +1047,12 @@ class GovTalk {
 									$package->writeElement('TransactionID', $this->_transactionId);
 									if ($this->_messageCorrelationId !== null) {
 										$package->writeElement('CorrelationID', $this->_messageCorrelationId);
-									}
-									if ($this->_messageTransformation !== 'XML') {
+									}else {
+										$package->writeElement('CorrelationID', null );
+                                    }
+									//if ($this->_messageTransformation !== 'XML') {
 										$package->writeElement('Transformation', $this->_messageTransformation);
-									}
+									//}
 									$package->writeElement('GatewayTest', $this->_govTalkTest);
 								$package->endElement(); # MessageDetails
 
@@ -1166,7 +1169,7 @@ class GovTalk {
 						} else {
 							return false;
 						}
-						
+
 					} else {
 						return false;
 					}

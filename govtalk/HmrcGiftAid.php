@@ -40,15 +40,15 @@ class HmrcGiftAid extends GiftAidGovTalk {
 	 * @var string
 	 */
 	private $_agentDetails = array();
-  
-  
+
+
 	/**
 	 * Specific Settings required for call HRMC Webservices.
 	 *
 	 * @var array
 	 */
   private $_Settings    = array();
-	
+
  /* System / internal variables. */
 
 	/**
@@ -72,17 +72,17 @@ class HmrcGiftAid extends GiftAidGovTalk {
 	public function __construct() {
     $cSettingsSelect = <<<EOD
       SELECT setting.name                                    AS name
-      ,      setting.value                                   AS value       
-      FROM   civicrm_gift_aid_submission_setting setting                                    
+      ,      setting.value                                   AS value
+      FROM   civicrm_gift_aid_submission_setting setting
 EOD;
-    $oDao = CRM_Core_DAO::executeQuery( $cSettingsSelect, array() );    
+    $oDao = CRM_Core_DAO::executeQuery( $cSettingsSelect, array() );
     while ( $oDao->fetch() ) {
       $this->_Settings[$oDao->name] = $oDao->value;
     }
-		
+
 		$govTalkSenderId = $this->_Settings['SENDER_ID'];
 		$govTalkPassword = $this->_Settings['SENDER_VALUE'];
-		
+
 		switch ($this->_Settings['MODE']) {
 			case 'dev':
 				parent::__construct( 'https://secure.dev.gateway.gov.uk/submission'
@@ -90,20 +90,21 @@ EOD;
                            , $govTalkPassword
                            );
 				$this->setTestFlag( true );
-			break;
+                break;
 			default:
 				parent::__construct( 'https://secure.gateway.gov.uk/submission'
                            , $govTalkSenderId
                            , $govTalkPassword
                            );
-			break;
+				$this->setTestFlag( false );
+                break;
     }
-		
+
 		$this->setMessageAuthentication( 'clear' );
-		$this->addChannelRoute( 'http://www.vedaconsulting.co.uk/uk-hrmc-gift-aid-online-submission/'
-                          , 'Veda Consulting HMRC Gift Aid Online Submission extension'
-                          , '0.1'
-                          );
+//		$this->addChannelRoute( 'http://www.vedaconsulting.co.uk/uk-hrmc-gift-aid-online-submission/'
+//                          , 'Veda Consulting HMRC Gift Aid Online Submission extension'
+//                          , '0.1'
+//                          );
 	}
 
  /* Public methods. */
@@ -116,15 +117,15 @@ EOD;
 	 * @param boolean $flag True to turn on IRmark generator, false to turn it off.
 	 */
 	public function setIRmarkGeneration($flag) {
-	
+
 		if (is_bool($flag)) {
 			$this->_generateIRmark = $flag;
 		} else {
 			return false;
 		}
-	
+
 	}
-	
+
 	/**
 	 * Sets details about the agent submitting the declaration.
 	 *
@@ -148,7 +149,7 @@ EOD;
 	 * @param string $reference An identifier for the agent's own reference (optional).
 	 */
 	public function setAgentDetails($company, array $address, array $contact = null, $reference = null) {
-	
+
 		if (preg_match('/[A-Za-z0-9 &\'\(\)\*,\-\.\/]*/', $company)) {
 			$this->_agentDetails['company'] = $company;
 			$this->_agentDetails['address'] = $address;
@@ -164,40 +165,42 @@ EOD;
 		} else {
 			return false;
 		}
-	
+
 	}
-  
+
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {
     $cDonorSelect = <<<EOD
-      SELECT batch.id                                        AS batch_id         
-      ,     batch.title                                      AS batch_name       
-      ,     batch.created_date                               AS created_date     
+      SELECT batch.id                                        AS batch_id
+      ,     batch.title                                      AS batch_name
+      ,     batch.created_date                               AS created_date
       ,     contact.id                                       AS contact_id
       ,     contact.first_name                               AS first_name
       ,     contact.last_name                                AS last_name
-      ,     address.street_number                            AS house_no 
-      ,     address.postal_code                              AS postcode 
-      ,     value_gift_aid_submission.amount                 AS amount     
+      ,     address.street_number                            AS house_no
+      ,     address.postal_code                              AS postcode
+      ,     value_gift_aid_submission.amount                 AS amount
       ,     value_gift_aid_submission.gift_aid_amount        AS gift_aid_amount
-      FROM  civicrm_entity_batch entity_batch                                    
+      FROM  civicrm_entity_batch entity_batch
       INNER JOIN civicrm_batch batch                                         ON batch.id = entity_batch.batch_id
-      INNER JOIN civicrm_contribution contribution                           ON entity_batch.entity_table = 'civicrm_contribution' AND entity_batch.entity_id = contribution.id 
-      INNER JOIN civicrm_contact      contact                                ON contact.id                = contribution.contact_id 
+      INNER JOIN civicrm_contribution contribution                           ON entity_batch.entity_table = 'civicrm_contribution' AND entity_batch.entity_id = contribution.id
+      INNER JOIN civicrm_contact      contact                                ON contact.id                = contribution.contact_id
       INNER JOIN civicrm_address      address                                ON address.id                = contact.id
-      INNER JOIN civicrm_value_gift_aid_submission value_gift_aid_submission ON value_gift_aid_submission.entity_id = contribution.id 
-      WHERE batch.id = %1            
+      INNER JOIN civicrm_value_gift_aid_submission value_gift_aid_submission ON value_gift_aid_submission.entity_id = contribution.id
+      WHERE batch.id = %1
 EOD;
     $aQueryParam = array( 1 => array( $pBatchId, 'Integer' ) );
-    $oDao        = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );    
+    $oDao        = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );
     $aDonors     = array();
     while ( $oDao->fetch() ) {
-      $aDonors[] = array( 'forename' => $oDao->first_name
-                        , 'surname'  => $oDao->last_name
-                        , 'house_no' => $oDao->house_no
-                        , 'postcode' => $oDao->postcode
+      $aDonors[] = array( 'forename'        => $oDao->first_name
+                        , 'surname'         => $oDao->last_name
+                        , 'house_no'        => $oDao->house_no
+                        , 'postcode'        => $oDao->postcode
+                        , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
+                        , 'gift_aid_amount' => $oDao->gift_aid_amount
                         );
     }
-    
+
     foreach ( $aDonors as $d ) {
       $package->startElement( 'GAD' );
         $package->startElement( 'Donor' );
@@ -205,11 +208,13 @@ EOD;
           $package->writeElement( 'Sur'     , $d['surname']  );
           $package->writeElement( 'House'   , $d['house_no'] );
           $package->writeElement( 'Postcode', $d['postcode'] );
-        $package->endElement(); # Donor    
-      $package->endElement(); # GAD    
+        $package->endElement(); # Donor
+        $package->writeElement( 'Date' , $d['date'] );
+        $package->writeElement( 'Total', $d['gift_aid_amount'] );
+      $package->endElement(); # GAD
     }
   }
-  
+
   private function build_claim_xml( $pBatchId, &$package ) {
     $cClaimOrgName         = $this->_Settings['CLAIMER_ORG_NAME'];
     $cClaimOrgHmrcref      = $this->_Settings['CLAIMER_ORG_HMRC_REF'];
@@ -234,10 +239,10 @@ EOD;
       $package->endElement(); # GASDS
     $package->endElement(); # Claim
   }
-  
+
   public function giftAidSubmit( $pBatchId ) {
     $cChardId              = $this->_Settings['CHAR_ID'];
-    $cOrganisation         = 'IR';
+    $cOrganisation         = 'HMRC';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
     $cClientProductVersion = '1.1 beta';
@@ -250,22 +255,21 @@ EOD;
     $cAuthOffPhone         = $this->_Settings['AUTH_OFF_PHONE']; //'';
     $cAuthOffPostcode      = $this->_Settings['AUTH_OFF_POSTCODE']; //'AB12 3CD';
     $cDeclaration          = 'yes';
-    
+
     // Set the message envelope
     $this->setMessageClass         ( 'HMRC-CHAR-CLM' );
     $this->setMessageQualifier     ( 'request'       );
     $this->setMessageFunction      ( 'submit'        );
-    $this->setMessageCorrelationId (  null           );
     $this->setMessageTransformation( 'XML'           );
     $this->addTargetOrganisation   ( $cOrganisation  );
-    
-    
+
+
     $this->addMessageKey( 'CHARID'
                         , $cChardId
                         );
     $this->addChannelRoute( $cClientUri
                           , $cClientProduct
-                          , $cClientProductVersion 
+                          , $cClientProductVersion
                           );
     // Build message body...
     $package = new XMLWriter();
@@ -282,12 +286,12 @@ EOD;
         $package->endElement(); # Keys
         $package->writeElement('PeriodEnd', $dReturnPeriod );
         $package->writeElement('DefaultCurrency', $sDefaultCurrency );
-        $package->writeElement('IRmark', $dReturnPeriod );
+        $package->startElement('IRmark');
           $package->writeAttribute('Type', 'generic');
           $package->text( $sIRmark );
-        $package->endElement(); 
+        $package->endElement(); # IRmark
         $package->writeElement('Sender', $sSender );
-        $package->endElement(); 
+        $package->endElement();
       $package->endElement(); #IRheader
       $package->startElement('R68');
         $package->startElement('AuthOfficial');
@@ -298,25 +302,54 @@ EOD;
           $package->startElement('OffID');
             $package->writeElement( 'Postcode', $cAuthOffPostcode );
           $package->endElement(); #OffID
-          $package->writeElement( 'Phone', $cAuthOffPhone );        
+          $package->writeElement( 'Phone', $cAuthOffPhone );
         $package->endElement(); #AuthOfficial
-        $package->writeElement( 'Declaration', $cDeclaration );        
+        $package->writeElement( 'Declaration', $cDeclaration );
         $this->build_claim_xml( $pBatchId, $package );
       $package->endElement(); #R68
     $package->endElement(); #IRenvelope
-    
+
 	  // Send the message and deal with the response...
     $this->setMessageBody( $package );
 
     if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
-      $returnable = $this->getResponseEndpoint();
-      $returnable['correlationid'] = $this->getResponseCorrelationId();
-      return $returnable;
+      return $this;
     } else {
-      return false;
+      return $this;
+//      return false;
     }
   }
-  	
+	public function declarationResponsePoll( $p_correlation_id = null, $p_poll_url = null ) {
+		if ($p_correlation_id === null) {
+			$sCorrelationId = $this->getResponseCorrelationId();
+		} else {
+      $sCorrelationId = $p_correlation_id;
+    }
+
+    if ( $p_poll_url !== null ) {
+      $this->setGovTalkServer( $p_poll_url );
+    } else {
+      $aEndPoint  = $this->getResponseEndpoint();
+      $sEndPoint  = $aEndPoint['endpoint'];
+      $this->setGovTalkServer( $sEndPoint );
+    }
+
+    // Set the message envelope
+    $this->setMessageClass         ( 'HMRC-CHAR-CLM' );
+    $this->setMessageQualifier     ( 'poll'          );
+    $this->setMessageFunction      ( 'submit'        );
+    $this->setMessageCorrelationId (  $sCorrelationId );
+    $this->setMessageTransformation( 'XML'           );
+    $this->setMessageBody          ( '' );
+
+    if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
+      return $this;
+    } else {
+      return $this;
+//      return false;
+    }
+  }
+
 	/**
 	 * Polls the Gateway for a submission response / error following a VAT
 	 * declaration request. By default the correlation ID from the last response
@@ -349,8 +382,8 @@ EOD;
 	 * @param string $pollUrl The URL of the Gateway to poll.
 	 * @return mixed An array of details relating to the return and payment, or false on failure.
 	 */
-	public function declarationResponsePoll($correlationId = null, $pollUrl = null) {
-	
+	public function XdeclarationResponsePoll($correlationId = null, $pollUrl = null) {
+
 		if ($correlationId === null) {
 			$correlationId = $this->getResponseCorrelationId();
 		}
@@ -359,28 +392,29 @@ EOD;
 			if ($pollUrl !== null) {
 				$this->setGovTalkServer($pollUrl);
 			}
-			$this->setMessageClass('HMRC-VAT-DEC');
+      $this->setMessageClass( 'HMRC-CHAR-CLM' );
 			$this->setMessageQualifier('poll');
 			$this->setMessageFunction('submit');
+      $this->setMessageTransformation( 'XML' );
 			$this->resetMessageKeys();
 			$this->setMessageBody('');
 			if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
-			
+
 				$messageQualifier = (string) $this->_fullResponseObject->Header->MessageDetails->Qualifier;
 				if ($messageQualifier == 'response') {
-				
+
 					$successResponse = $this->_fullResponseObject->Body->SuccessResponse;
-					
+
 					if (isset($successResponse->IRmarkReceipt)) {
 						$irMarkReceipt = (string) $successResponse->IRmarkReceipt->Message;
 					}
-					
+
 					$responseMessage = array();
 					foreach ($successResponse->Message AS $message) {
 						$responseMessage[] = (string) $message;
 					}
 					$responseAcceptedTime = strtotime($successResponse->AcceptedTime);
-					
+
 					$declarationResponse = $successResponse->ResponseData->VATDeclarationResponse;
 					$declarationPeriod = array('id' => (string) $declarationResponse->Header->VATPeriod->PeriodId,
 					                           'start' => strtotime($declarationResponse->Header->VATPeriod->PeriodStartDate),
@@ -390,7 +424,7 @@ EOD;
 
                $paymentDetails = array('narrative' => (string) $declarationResponse->Body->PaymentNotification->Narrative,
 					                        'netvat' => (string) $declarationResponse->Body->PaymentNotification->NetVAT);
-               
+
 					$paymentNotifcation = $successResponse->ResponseData->VATDeclarationResponse->Body->PaymentNotification;
 					if (isset($paymentNotifcation->NilPaymentIndicator)) {
 						$paymentDetails['payment'] = array('method' => 'nilpayment', 'additional' => null);
@@ -401,29 +435,29 @@ EOD;
 					} else if (isset($paymentNotifcation->PaymentRequest)) {
 						$paymentDetails['payment'] = array('method' => 'payment', 'additional' => (string) $paymentNotifcation->PaymentRequest->DirectDebitInstructionStatus);
 					}
-					
+
 					return array('message' => $responseMessage,
 					             'irmark' => $irMarkReceipt,
 					             'accept_time' => $responseAcceptedTime,
 					             'period' => $declarationPeriod,
 					             'payment' => $paymentDetails);
-					
+
 				} else if ($messageQualifier == 'acknowledgement') {
 					$returnable = $this->getResponseEndpoint();
 					$returnable['correlationid'] = $this->getResponseCorrelationId();
-					return $returnable;
+//					return $returnable;
 				} else {
-					return false;
+//					return false;
 				}
 			} else {
-				return false;
+//				return false;
 			}
 		} else {
-			return false;
+//			return false;
 		}
-	
+    return $this;
 	}
-	
+
  /* Protected methods. */
 
 	/**
@@ -436,24 +470,24 @@ EOD;
 	 * @return string The new package after addition of the IRmark.
 	 */
 	protected function packageDigest( $package ) {
-	
+
 		if ($this->_generateIRmark === true) {
 			$packageSimpleXML = simplexml_load_string( $package );
 			$packageNamespaces = $packageSimpleXML->getNamespaces();
-			
+
 			preg_match('/<Body>(.*?)<\/Body>/', str_replace("\n", '�', $package), $matches);
 			$packageBody = str_replace('�', "\n", $matches[1]);
-			
+
 			$irMark = base64_encode($this->_generateIRMark($packageBody, $packageNamespaces));
 			$package = str_replace('IRmark+Token', $irMark, $package);
 		}
-		
+
 		return $package;
-	
+
 	}
 
  /* Private methods. */
- 
+
 	/**
 	 * Generates an IRmark hash from the given XML string for use in the IRmark
 	 * node inside the message body.  The string passed must contain one IRmark
@@ -464,12 +498,12 @@ EOD;
 	 * @return string The IRmark hash.
 	 */
 	private function _generateIRMark($xmlString, $namespaces = null) {
-	
+
 		if (is_string($xmlString)) {
 			$xmlString = preg_replace('/<(vat:)?IRmark Type="generic">[A-Za-z0-9\/\+=]*<\/(vat:)?IRmark>/', '', $xmlString, -1, $matchCount);
 			if ($matchCount == 1) {
 				$xmlDom = new DOMDocument;
-				
+
 				if ($namespaces !== null && is_array($namespaces)) {
 					$namespaceString = array();
 					foreach ($namespaces AS $key => $value) {
@@ -492,6 +526,31 @@ EOD;
 			}
 		} else {
 			return false;
-		}	
+		}
 	}
+
+  function giftAidPoll( $p_endpoint, $p_correlation ) {
+//    $sOutcome = null;
+    $pollResponse = $this->declarationResponsePoll( $p_correlation, $p_endpoint );
+
+//    if ( $pollResponse ) {
+//      if ( isset( $pollResponse['endpoint'] ) ) {
+//        $sOutcome = 'Response pending.  Please wait '.$pollResponse['interval'].' seconds and then refresh this page to try again.';
+//      } else {
+//        $sOutcome = 'Response received, delete command sent.  See below:';
+////        var_dump($pollResponse);
+//        if ( $hmrcVat->sendDeleteRequest() ) {
+//          $sOutcome = 'Delete request successful. Resource no longer exists on Gateway.';
+//        } else {
+//          $sOutcome = 'Delete request failed. Resource may still exist on Gateway.';
+//        }
+//      }
+//    } else {
+//      return false;
+////      $sOutcome = 'Government Gateway returned errors in response to poll request:';
+////      var_dump($hmrcVat->getResponseErrors());
+//    }
+
+    return $pollResponse;
+  }
 }

@@ -1,6 +1,6 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
- 
+
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 {if $task eq 'VIEW_BATCH'}
@@ -11,7 +11,7 @@
                 <th>Date Created</th>
                 <th>Total</th>
                 <th>Gift Aid Amount</th>
-                <th>Submitted On</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -21,26 +21,26 @@
                     <td>{$batch.created_date}</td>
                     <td>{$batch.total_amount}</td>
                     <td>{$batch.total_gift_aid_amount}</td>
-                    <td><span id="submit_now">{$batch.submit_link}</span></td>
+                    <td>{$batch.action}</td>
                 </tr>
             {/foreach}
         </tbody>
-    </table>    
-    {literal}    
+    </table>
+    {literal}
     <script type="text/javascript">
          cj(document).ready(function() {
             cj('#batch_table').dataTable( {
-                                                "aoColumns": [
-                                                                { "sWidth": "30%" },
-                                                                { "sWidth": "15%", "sType": "date" },
-                                                                { "sWidth": "10%", "sType": "numeric" },
-                                                                { "sWidth": "10%", "sType": "numeric" },
-                                                                { "sWidth": "20%" }
-                                                              ]
-                                               }
+                                           "aoColumns": [
+                                                           { "sWidth": "30%" },
+                                                           { "sWidth": "15%", "sType": "date" },
+                                                           { "sWidth": "10%", "sType": "numeric" },
+                                                           { "sWidth": "10%", "sType": "numeric" },
+                                                           { "sWidth": "20%" }
+                                                         ]
+                                          }
                                         );
-                  
-          
+
+
             cj('#submit_now a').click( function() {
                 if (confirm('This action cannot be reversed.  Are you sure?') ) {
                     ;
@@ -48,10 +48,14 @@
                     return false;
                 }
             });
-         } );   
+         } );
 
-    </script>    
+    </script>
     {/literal}
+{elseif $task eq 'POLLING'}
+  <div>
+    {$poll_message}
+  </div>
 {else}
     <form id="submission_frm">
         <div class="crm-block crm-form-block">
@@ -76,10 +80,10 @@
                         <td>{$submission.hmrc_response}</td>
                     </tr>
                 </tbody>
-            </table>      
+            </table>
         </div>
     </form>
-    {literal}  
+    {literal}
     <script type="text/javascript">
          cj(document).ready(function() {
             cj('#submission_table').dataTable( {
@@ -93,7 +97,7 @@
                                                               ]
                                                }
                                              );
-         } );   
-    </script>    
+         } );
+    </script>
     {/literal}
 {/if}

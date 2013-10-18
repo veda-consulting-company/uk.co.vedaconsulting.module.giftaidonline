@@ -3,7 +3,7 @@
 /*
  * GiftAidGovTalk - extends the GovTalk class with specifics for submiting
  * Gift Aid data to HMRC.
- * 
+ *
  * Created by Long Luong on 13-03-2013.
  * Copyright 2013, Veda Consulting Limited. All rights reserved.
 */
@@ -20,7 +20,7 @@ class GiftAidGovTalk extends GovTalk {
     if ( empty( $messageCorrelationId ) ) {
       return true;
     }
-    parent::setMessageCorrelationId( $messageCorrelationId);
+    return parent::setMessageCorrelationId( $messageCorrelationId);
   }
-  
-}  
+
+}

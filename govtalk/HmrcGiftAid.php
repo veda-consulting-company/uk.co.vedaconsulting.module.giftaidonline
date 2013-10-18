@@ -248,7 +248,7 @@ EOD;
     $cClientProductVersion = '1.1 beta';
     $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
-    $sIRmark               = 'ymFYM1StJ3IbfyieQuJ04tPXOBY';
+    $sIRmark               = '--%<--ymFYM1StJ3IbfyieQuJ04tPXOBY-->%--';
     $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';
     $cAuthOffSurname       = $this->_Settings['AUTH_OFF_SURNAME']; //'Smith';
     $cAuthOffForename      = $this->_Settings['AUTH_OFF_FORENAME']; //'John';

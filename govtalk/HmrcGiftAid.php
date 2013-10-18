@@ -248,7 +248,6 @@ EOD;
     $cClientProductVersion = '1.1 beta';
     $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
-    $sIRmark               = '--%<--ymFYM1StJ3IbfyieQuJ04tPXOBY-->%--';
     $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';
     $cAuthOffSurname       = $this->_Settings['AUTH_OFF_SURNAME']; //'Smith';
     $cAuthOffForename      = $this->_Settings['AUTH_OFF_FORENAME']; //'John';
@@ -271,6 +270,7 @@ EOD;
                           , $cClientProduct
                           , $cClientProductVersion
                           );
+    $this->setIRmarkGeneration( true );
     // Build message body...
     $package = new XMLWriter();
     $package->openMemory();
@@ -286,10 +286,12 @@ EOD;
         $package->endElement(); # Keys
         $package->writeElement('PeriodEnd', $dReturnPeriod );
         $package->writeElement('DefaultCurrency', $sDefaultCurrency );
-        $package->startElement('IRmark');
-          $package->writeAttribute('Type', 'generic');
-          $package->text( $sIRmark );
-        $package->endElement(); # IRmark
+        if ($this->_generateIRmark === true) {
+          $package->startElement('IRmark');
+            $package->writeAttribute('Type', 'generic');
+            $package->text('IRmark+Token');
+          $package->endElement(); # IRmark
+        }
         $package->writeElement('Sender', $sSender );
         $package->endElement();
       $package->endElement(); #IRheader

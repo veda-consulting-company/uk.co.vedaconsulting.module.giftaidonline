@@ -293,7 +293,6 @@ EOD;
           $package->endElement(); # IRmark
         }
         $package->writeElement('Sender', $sSender );
-        $package->endElement();
       $package->endElement(); #IRheader
       $package->startElement('R68');
         $package->startElement('AuthOfficial');
@@ -477,8 +476,8 @@ EOD;
 			$packageSimpleXML = simplexml_load_string( $package );
 			$packageNamespaces = $packageSimpleXML->getNamespaces();
 
-			preg_match('/<Body>(.*?)<\/Body>/', str_replace("\n", '�', $package), $matches);
-			$packageBody = str_replace('�', "\n", $matches[1]);
+			preg_match('/<Body>(.*?)<\/Body>/', str_replace("\n", '¬', $package), $matches);
+			$packageBody = str_replace('¬', "\n", $matches[1]);
 
 			$irMark = base64_encode($this->_generateIRMark($packageBody, $packageNamespaces));
 			$package = str_replace('IRmark+Token', $irMark, $package);

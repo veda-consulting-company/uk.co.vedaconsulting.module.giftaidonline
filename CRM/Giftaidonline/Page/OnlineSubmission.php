@@ -240,8 +240,10 @@ EOF;
       $sRefreshLink      = sprintf( "<a href='%s'>Refresh</a>"
                            , $sUrl
                            );
-      $sResponseStatus = sprintf( "<div>Status:<strong>%s</strong></div>"
+      $sResponseError  = $this->_response_error_to_string( $p_hmrc_gift_aid->getFullXMLResponse(), '<br /><br />' );
+      $sResponseStatus = sprintf( "<div>Status:<strong>%s</strong></div><div>%s</div>"
                                 , $p_hmrc_gift_aid->getResponseQualifier()
+                                , $sResponseError
                                 );
       if ( !empty( $aEndPoint ) ) {
         $sResponseStatus .= sprintf( "<div>Please wait for %s seconds then click on the Refresh link to get an update of the submission.</div><div>[%s]</div>"
@@ -275,17 +277,18 @@ EOF;
     return implode( ',', $aErrors );
   }
 
-  private function _response_error_to_string( $p_response_errors ) {
-    if ( !is_array( $p_response_errors ) ) {
-      return '';
+  private function _response_error_to_string( $p_response_errors, $p_separator = "\n" ) {
+    $oXmlReader =  new XMLReader();
+    $oXmlReader->XML( $p_response_errors );
+    $aError = array();
+    while ( $oXmlReader->read() ) {
+      if ( $oXmlReader->name === 'Error' ) {
+        $aError[] = $oXmlReader->readString() ;
+        $oXmlReader->next();
+      }
     }
-    $aErrors   = array();
-    $aErrors[] = $this->_parse_response_error( $p_response_errors['fatal']       );
-    $aErrors[] = $this->_parse_response_error( $p_response_errors['recoverable'] );
-    $aErrors[] = $this->_parse_response_error( $p_response_errors['business']    );
-    $aErrors[] = $this->_parse_response_error( $p_response_errors['warning']     );
 
-    return implode( ',', $aErrors );
+    return implode( $p_separator, $aError );
   }
 
   function process_batch ( $p_batch_id )   {
@@ -301,7 +304,7 @@ EOF;
                                   , $oHmrcGiftAid->getFullXMLRequest()
                                   , $oHmrcGiftAid->getFullXMLResponse()
                                   , $oHmrcGiftAid->getResponseQualifier()
-                                  , $this->_response_error_to_string( $oHmrcGiftAid->getResponseErrors() )
+                                  , $this->_response_error_to_string( $oHmrcGiftAid->getFullXMLResponse() )
                                   , $sEndPoint
                                   , $sEndPointInterval
                                   , $oHmrcGiftAid->getResponseCorrelationId()
@@ -324,7 +327,7 @@ EOF;
                             , $oHmrcGiftAid->getFullXMLRequest()
                             , $oHmrcGiftAid->getFullXMLResponse()
                             , $oHmrcGiftAid->getResponseQualifier()
-                            , $this->_response_error_to_string( $oHmrcGiftAid->getResponseErrors() )
+                            , $this->_response_error_to_string( $oHmrcGiftAid->getFullXMLResponse() )
                             , $sEndPoint
                             , $sEndPointInterval
                             , $oHmrcGiftAid->getResponseCorrelationId()

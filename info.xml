@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8' ?> 
+﻿<?xml version='1.0' encoding='UTF-8' ?> 
 <extension key="uk.co.vedaconsulting.module.giftaidonline" type="module">
   <downloadUrl>https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/archive/v1.1.0.zip</downloadUrl>
   <file>giftaidonline</file>
@@ -27,4 +27,3 @@
     <namespace>CRM/Giftaidonline</namespace>
   </civix>
 </extension>
-ension>

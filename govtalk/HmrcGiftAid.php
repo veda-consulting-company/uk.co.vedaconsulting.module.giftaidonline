@@ -177,13 +177,13 @@ EOD;
       ,      contact.first_name                                        AS first_name
       ,      contact.last_name                                         AS last_name
       ,      substr( concat( value_gift_aid_submission.address
-                           , ','
+                           , '\n'
                            )
                    , 1
                    , instr( concat( value_gift_aid_submission.address
-                                  , ','
+                                  , '\n'
                                   )
-                          , ','
+                          , '\n	'
                           ) -1
                    )                                                   AS house_no
       ,      value_gift_aid_submission.post_code                       AS postcode

@@ -176,17 +176,17 @@ EOD;
       ,      contact.id                                                AS contact_id
       ,      contact.first_name                                        AS first_name
       ,      contact.last_name                                         AS last_name
-      ,      substr( concat( value_gift_aid_declaration.address
+      ,      substr( concat( value_gift_aid_submission.address
                            , ','
                            )
                    , 1
-                   , instr( concat( value_gift_aid_declaration.address
+                   , instr( concat( value_gift_aid_submission.address
                                   , ','
                                   )
                           , ','
                           ) -1
                    )                                                   AS house_no
-      ,      value_gift_aid_declaration.post_code                      AS postcode
+      ,      value_gift_aid_submission.post_code                       AS postcode
       ,      value_gift_aid_submission.amount                          AS amount
       ,      value_gift_aid_submission.gift_aid_amount                 AS gift_aid_amount
       FROM  civicrm_entity_batch entity_batch
@@ -194,7 +194,6 @@ EOD;
       INNER JOIN civicrm_contribution contribution                             ON entity_batch.entity_table            = 'civicrm_contribution' AND entity_batch.entity_id = contribution.id
       INNER JOIN civicrm_contact      contact                                  ON contact.id                           = contribution.contact_id
       INNER JOIN civicrm_value_gift_aid_submission value_gift_aid_submission   ON value_gift_aid_submission.entity_id  = contribution.id
-      INNER JOIN civicrm_value_gift_aid_declaration value_gift_aid_declaration ON value_gift_aid_declaration.entity_id = contact.id
       WHERE batch.id = %1
 EOD;
     $aQueryParam = array( 1 => array( $pBatchId, 'Integer' ) );

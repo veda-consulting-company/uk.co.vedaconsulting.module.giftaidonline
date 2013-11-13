@@ -167,12 +167,27 @@ EOD;
 		}
 
 	}
+  
+  //format postcode
+  function postcodeFormat($postcode)
+  {
+      //remove non alphanumeric characters
+      $cleanPostcode = preg_replace("/[^A-Za-z0-9]/", '', $postcode);
+
+      //make uppercase
+      $cleanPostcode = strtoupper($cleanPostcode);
+
+      //insert space
+      $postcode = substr($cleanPostcode, 0, -3) . " " . substr($cleanPostcode, -3);
+
+      return $postcode;
+  }
 
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {
     $cDonorSelect = <<<EOD
       SELECT batch.id                                                  AS batch_id
       ,      batch.title                                               AS batch_name
-      ,      batch.created_date                                        AS created_date
+      ,      contribution.receive_date                                 AS created_date
       ,      contact.id                                                AS contact_id
       ,      contact.first_name                                        AS first_name
       ,      contact.last_name                                         AS last_name
@@ -200,10 +215,14 @@ EOD;
     $oDao        = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );
     $aDonors     = array();
     while ( $oDao->fetch() ) {
+      
+      // Need to clean up the postcode before we can submit it
+      $formattedPostcode = self::postcodeFormat($oDao->postcode);
+      
       $aDonors[] = array( 'forename'        => $oDao->first_name
                         , 'surname'         => $oDao->last_name
                         , 'house_no'        => $oDao->house_no
-                        , 'postcode'        => $oDao->postcode
+                        , 'postcode'        => $formattedPostcode //$oDao->postcode
                         , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
                         , 'gift_aid_amount' => $oDao->amount
                         );

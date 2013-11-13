@@ -183,6 +183,19 @@ EOD;
       return $postcode;
   }
 
+  function IsPostcode($postcode)
+  {
+      $postcode = strtoupper(str_replace(' ','',$postcode));
+      if(preg_match("/^[A-Z]{1,2}[0-9]{2,3}[A-Z]{2}$/",$postcode) || preg_match("/^[A-Z]{1,2}[0-9]{1}[A-Z]{1}[0-9]{1}[A-Z]{2}$/",$postcode) || preg_match("/^GIR0[A-Z]{2}$/",$postcode))
+      {
+          return true;
+      }
+      else
+      {
+          return false;
+      }
+  }
+
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {
     $cDonorSelect = <<<EOD
       SELECT batch.id                                                  AS batch_id
@@ -219,13 +232,19 @@ EOD;
       // Need to clean up the postcode before we can submit it
       $formattedPostcode = self::postcodeFormat($oDao->postcode);
       
-      $aDonors[] = array( 'forename'        => $oDao->first_name
-                        , 'surname'         => $oDao->last_name
-                        , 'house_no'        => $oDao->house_no
-                        , 'postcode'        => $formattedPostcode //$oDao->postcode
-                        , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
-                        , 'gift_aid_amount' => $oDao->amount
-                        );
+      // Need to find a way to let the submitter know if the contribution has been knocked off
+      // Can then allow the user to fix
+      // at the moment just stoppping invalid data from pushing through
+      if ((!(empty($oDao->house_no))) && (self::IsPostcode($formattedPostcode))) 
+      {
+        $aDonors[] = array( 'forename'        => $oDao->first_name
+                          , 'surname'         => $oDao->last_name
+                          , 'house_no'        => $oDao->house_no
+                          , 'postcode'        => $formattedPostcode //$oDao->postcode
+                          , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
+                          , 'gift_aid_amount' => $oDao->amount
+                          );
+      }
     }
 
     foreach ( $aDonors as $d ) {
@@ -272,7 +291,7 @@ EOD;
     $cOrganisation         = 'HMRC';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
-    $cClientProductVersion = '1.1 beta';
+    $cClientProductVersion = '1.3.3 beta'; // We should get this from the info.xml
     $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
     $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';

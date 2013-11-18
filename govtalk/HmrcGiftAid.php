@@ -30,6 +30,7 @@
  */
 require_once 'CRM/Core/Page.php';
 require_once ( dirname(__FILE__) . '/GiftAidGovTalk.php' );
+
 class HmrcGiftAid extends GiftAidGovTalk {
 
  /* General IRenvelope related variables. */
@@ -167,7 +168,70 @@ EOD;
 		}
 
 	}
-  
+
+  function getHouseNo( $p_address_line ) {
+    /*
+     * split the phrase by any number of commas or space characters,
+     * which include " ", \r, \t, \n and \f
+     */
+    $aAddress = preg_split( "/[,\s]+/", $p_address_line );
+    if ( empty( $aAddress ) ) {
+      return null;
+    } else {
+      return $aAddress[0];
+    }
+  }
+
+  function getDonorAddress( $p_contact_id, $p_contribution_id,  $p_contribution_receive_date ) {
+    $oSetting = new CRM_Giftaidonline_Page_giftAidSubmissionSettings();
+    $sSource  = $oSetting->get_contribution_details_source();
+
+    $bGetAddressFromDeclaration = stristr( $sSource, 'CONTRIBUTION' ) ? false : true;
+    if ( $bGetAddressFromDeclaration ) {
+      $sSql =<<<SQL
+              SELECT   id         AS id
+              ,        address    AS address
+              ,        post_code  AS postcode
+              FROM     civicrm_value_gift_aid_declaration
+              WHERE    entity_id  = %1
+              AND      start_date < %2
+              AND      eligible_for_gift_aid = 1
+              ORDER BY start_date ASC
+              LIMIT  1
+SQL;
+      $aParams = array( 1 => array( $p_contact_id               , 'Integer' )
+                      , 2 => array( $p_contribution_receive_date, 'Date'    )
+                      );
+    } else {
+      $sSql =<<<SQL
+              SELECT   id        AS id
+              ,        address   AS address
+              ,        post_code AS postcode
+              FROM     civicrm_value_gift_aid_submission
+              WHERE    entity_id  = %1
+              LIMIT  1
+SQL;
+      $aParams = array( 1 => array( $p_contribution_id, 'Integer' ) );
+    }
+
+    $oDao = CRM_Core_DAO::executeQuery( $sSql, $aParams );
+
+    if ( is_a( $oDao, 'DB_Error' ) ) {
+      CRM_Core_Error::fatal();
+    }
+
+    $aAddress['id']       = null;
+    $aAddress['address']  = null;
+    $aAddress['postcode'] = null;
+    if ( $oDao->fetch() ) {
+      $aAddress['id']       = $oDao->id;
+      $aAddress['address']  = self::getHouseNo( $oDao->address );
+      $aAddress['postcode'] = $oDao->postcode;
+    }
+
+    return $aAddress;
+  }
+
   //format postcode
   function postcodeFormat($postcode)
   {
@@ -201,20 +265,10 @@ EOD;
       SELECT batch.id                                                  AS batch_id
       ,      batch.title                                               AS batch_name
       ,      contribution.receive_date                                 AS created_date
+      ,      contribution.id                                           AS contribution_id
       ,      contact.id                                                AS contact_id
       ,      contact.first_name                                        AS first_name
       ,      contact.last_name                                         AS last_name
-      ,      substr( concat( value_gift_aid_submission.address
-                           , "\n"
-                           )
-                   , 1
-                   , instr( concat( value_gift_aid_submission.address
-                                  , "\n"
-                                  )
-                          , "\n"
-                          ) -1
-                   )                                                   AS house_no
-      ,      value_gift_aid_submission.post_code                       AS postcode
       ,      value_gift_aid_submission.amount                          AS amount
       ,      value_gift_aid_submission.gift_aid_amount                 AS gift_aid_amount
       FROM  civicrm_entity_batch entity_batch
@@ -227,19 +281,25 @@ EOD;
     $aQueryParam = array( 1 => array( $pBatchId, 'Integer' ) );
     $oDao        = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );
     $aDonors     = array();
+
     while ( $oDao->fetch() ) {
-      
+      $aAddress  = self::getDonorAddress( $oDao->contact_id
+                                        , $oDao->contribution_id
+                                        , $oDao->created_date );
+      $sHouseNo  = $aAddress['address'];
+      $sPostcode = $aAddress['postcode'];
+
       // Need to clean up the postcode before we can submit it
-      $formattedPostcode = self::postcodeFormat($oDao->postcode);
-      
+      $formattedPostcode = self::postcodeFormat( $sPostcode );
+
       // Need to find a way to let the submitter know if the contribution has been knocked off
       // Can then allow the user to fix
       // at the moment just stoppping invalid data from pushing through
-      if ((!(empty($oDao->house_no))) && (self::IsPostcode($formattedPostcode))) 
+      if ( ( !( empty( $sHouseNo ) ) ) && ( self::IsPostcode( $formattedPostcode ) ) )
       {
         $aDonors[] = array( 'forename'        => $oDao->first_name
                           , 'surname'         => $oDao->last_name
-                          , 'house_no'        => $oDao->house_no
+                          , 'house_no'        => $sHouseNo
                           , 'postcode'        => $formattedPostcode //$oDao->postcode
                           , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
                           , 'gift_aid_amount' => $oDao->amount

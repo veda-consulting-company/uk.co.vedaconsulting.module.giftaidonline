@@ -1067,6 +1067,7 @@ class GovTalk {
 											case 'alternative':
 												if ($authenticationArray = $this->generateAlternativeAuthentication($this->_transactionId)) {
 													$package->writeElement('Method', $authenticationArray['method']);
+                          $package->writeElement('Role', 'principal');
 													$package->writeElement('Value', $authenticationArray['token']);
 												} else {
 													return false;
@@ -1074,6 +1075,7 @@ class GovTalk {
 											break;
 											case 'clear':
 												$package->writeElement('Method', 'clear');
+												$package->writeElement('Role', 'principal');
 												$package->writeElement('Value', $this->_govTalkPassword);
 											break;
 										}

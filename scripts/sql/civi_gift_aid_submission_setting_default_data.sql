@@ -95,7 +95,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 ) VALUES 
 ( 'PERIOD_END'
 , '2013-03-31'
-, 'The period end date of the current claim (set to YYYY-DD-MM format)'
+, 'The period end date of the current claim (set to YYYY-MM-DD format)'
 );
 
 INSERT INTO `civicrm_gift_aid_submission_setting` 

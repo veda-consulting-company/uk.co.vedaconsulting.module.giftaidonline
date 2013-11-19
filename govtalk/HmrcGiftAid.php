@@ -204,13 +204,9 @@ EOD;
       ,      contact.id                                                AS contact_id
       ,      contact.first_name                                        AS first_name
       ,      contact.last_name                                         AS last_name
-      ,      substr( concat( value_gift_aid_submission.address
-                           , "\n"
-                           )
+      ,      substr( value_gift_aid_submission.address
                    , 1
-                   , instr( concat( value_gift_aid_submission.address
-                                  , "\n"
-                                  )
+                   , instr( value_gift_aid_submission.address
                           , "\n"
                           ) -1
                    )                                                   AS house_no
@@ -278,6 +274,7 @@ EOD;
       $package->endElement(); # Regulator
       $package->startElement(   'Repayment'                  );
         $this->build_giftaid_donors_xml( $pBatchId, $package );
+        $package->writeElement( 'EarliestGAdate'  , '2012-01-01' );
       $package->endElement(); # Repayment
       $package->startElement(   'GASDS'                                      );
         $package->writeElement( 'ConnectedCharities'  , $cConnectedCharities );
@@ -288,7 +285,8 @@ EOD;
 
   public function giftAidSubmit( $pBatchId ) {
     $cChardId              = $this->_Settings['CHAR_ID'];
-    $cOrganisation         = 'HMRC';
+    //$cOrganisation         = 'HMRC';
+    $cOrganisation         = 'IR';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
     $cClientProductVersion = '1.3.3 beta'; // We should get this from the info.xml

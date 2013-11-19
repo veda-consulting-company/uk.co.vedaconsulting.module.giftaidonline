@@ -183,8 +183,11 @@ EOD;
   }
 
   function getDonorAddress( $p_contact_id, $p_contribution_id,  $p_contribution_receive_date ) {
-    $oSetting = new CRM_Giftaidonline_Page_giftAidSubmissionSettings();
-    $sSource  = $oSetting->get_contribution_details_source();
+    $oSetting             = new CRM_Giftaidonline_Page_giftAidSubmissionSettings();
+    $sSource              = $oSetting->get_contribution_details_source();
+    $aAddress['id']       = null;
+    $aAddress['address']  = null;
+    $aAddress['postcode'] = null;
 
     $bGetAddressFromDeclaration = stristr( $sSource, 'CONTRIBUTION' ) ? false : true;
     if ( $bGetAddressFromDeclaration ) {
@@ -193,8 +196,8 @@ EOD;
               ,        address    AS address
               ,        post_code  AS postcode
               FROM     civicrm_value_gift_aid_declaration
-              WHERE    entity_id  = %1
-              AND      start_date < %2
+              WHERE    entity_id  =  %1
+              AND      start_date <= %2
               AND      eligible_for_gift_aid = 1
               ORDER BY start_date ASC
               LIMIT  1
@@ -213,20 +216,20 @@ SQL;
 SQL;
       $aParams = array( 1 => array( $p_contribution_id, 'Integer' ) );
     }
-
-    $oDao = CRM_Core_DAO::executeQuery( $sSql, $aParams );
-
-    if ( is_a( $oDao, 'DB_Error' ) ) {
-      CRM_Core_Error::fatal();
-    }
-
-    $aAddress['id']       = null;
-    $aAddress['address']  = null;
-    $aAddress['postcode'] = null;
-    if ( $oDao->fetch() ) {
-      $aAddress['id']       = $oDao->id;
-      $aAddress['address']  = self::getHouseNo( $oDao->address );
-      $aAddress['postcode'] = $oDao->postcode;
+    $oDao = CRM_Core_DAO::executeQuery( $sSql
+                                      , $aParams
+                                      , $abort         = TRUE
+                                      , $daoName       = NULL
+                                      , $freeDAO       = FALSE
+                                      , $i18nRewrite   = TRUE
+                                      , $trapException = TRUE /* This must be explicitly set to TRUE for the code below to handle any Exceptions */
+                                      );
+    if ( !( is_a( $oDao, 'DB_Error' ) ) ) {
+      if ( $oDao->fetch() ) {
+        $aAddress['id']       = $oDao->id;
+        $aAddress['address']  = self::getHouseNo( $oDao->address );
+        $aAddress['postcode'] = $oDao->postcode;
+      }
     }
 
     return $aAddress;
@@ -285,7 +288,7 @@ EOD;
     while ( $oDao->fetch() ) {
       $aAddress  = self::getDonorAddress( $oDao->contact_id
                                         , $oDao->contribution_id
-                                        , $oDao->created_date );
+                                        , date('Ymd', strtotime( $oDao->created_date ) ) );
       $sHouseNo  = $aAddress['address'];
       $sPostcode = $aAddress['postcode'];
 

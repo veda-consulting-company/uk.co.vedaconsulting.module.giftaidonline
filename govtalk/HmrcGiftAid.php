@@ -169,7 +169,7 @@ EOD;
 
 	}
 
-  function getHouseNo( $p_address_line ) {
+  private function getHouseNo( $p_address_line ) {
     /*
      * split the phrase by any number of commas or space characters,
      * which include " ", \r, \t, \n and \f
@@ -182,7 +182,7 @@ EOD;
     }
   }
 
-  function getDonorAddress( $p_contact_id, $p_contribution_id,  $p_contribution_receive_date ) {
+  private function getDonorAddress( $p_contact_id, $p_contribution_id,  $p_contribution_receive_date ) {
     $oSetting             = new CRM_Giftaidonline_Page_giftAidSubmissionSettings();
     $sSource              = $oSetting->get_contribution_details_source();
     $aAddress['id']       = null;
@@ -263,6 +263,44 @@ SQL;
       }
   }
 
+  private function isValidPersonName( $p_name ) {
+    $bValid = true;
+    if ( empty( $p_name ) ||  !( preg_match('#^[A-Z \'.-]{1,50}$#i', $p_name ) ) ) {
+      /* Name must be 1-50 characters Alphabetic including the single quote, dot, and hyphen symbol */
+      $bValid = false;
+    }
+
+    return $bValid;
+  }
+
+  private function logBadDonorRecord( $batch_id
+                                    , $batch_name
+                                    , $created_date
+                                    , $contribution_id
+                                    , $contact_id
+                                    , $first_name
+                                    , $last_name
+                                    , $amount
+                                    , $gift_aid_amount
+                                    , $address
+                                    , $postcode
+                                    ) {
+    $sMessage =<<<EOF
+        batch_id: $batch_id
+      , batch_name: $batch_name
+      , created_date: $created_date
+      , contribution_id: $contribution_id
+      , contact_id: $contact_id
+      , first_name: $first_name
+      , last_name: $last_name
+      , amount: $amount
+      , gift_aid_amount: $gift_aid_amount
+      , address: $address
+      , postcode: $postcode
+EOF;
+    CRM_Core_Error::debug_log_message( "Invalid Donor Record. Details ...\n$sMessage", TRUE );
+  }
+
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {
     $cDonorSelect = <<<EOD
       SELECT batch.id                                                  AS batch_id
@@ -281,32 +319,52 @@ SQL;
       INNER JOIN civicrm_value_gift_aid_submission value_gift_aid_submission   ON value_gift_aid_submission.entity_id  = contribution.id
       WHERE batch.id = %1
 EOD;
-    $aQueryParam = array( 1 => array( $pBatchId, 'Integer' ) );
-    $oDao        = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );
-    $aDonors     = array();
+    $aQueryParam          = array( 1 => array( $pBatchId, 'Integer' ) );
+    $oDao                 = CRM_Core_DAO::executeQuery( $cDonorSelect, $aQueryParam );
+    $aDonors              = array();
+    $bValidDonorData      = true;
+    $aAddress['address']  = null;
+    $aAddress['postcode'] = null;
 
     while ( $oDao->fetch() ) {
-      $aAddress  = self::getDonorAddress( $oDao->contact_id
-                                        , $oDao->contribution_id
-                                        , date('Ymd', strtotime( $oDao->created_date ) ) );
-      $sHouseNo  = $aAddress['address'];
-      $sPostcode = $aAddress['postcode'];
+      $bValidDonorData = self::isValidPersonName( $oDao->first_name ) && self::isValidPersonName( $oDao->last_name );
+      if ( $bValidDonorData ) {
+        $aAddress  = self::getDonorAddress( $oDao->contact_id
+                                          , $oDao->contribution_id
+                                          , date('Ymd', strtotime( $oDao->created_date ) ) );
+        // Need to clean up the postcode before we can submit it
+        $formattedPostcode = self::postcodeFormat( $aAddress['postcode'] );
 
-      // Need to clean up the postcode before we can submit it
-      $formattedPostcode = self::postcodeFormat( $sPostcode );
+        $bValidAddress = !( empty( $aAddress['address'] ) ) && self::IsPostcode( $formattedPostcode ) ;
+        if ( !$bValidAddress ) {
+          $bValidDonorData = false;
+        }
+      }
 
       // Need to find a way to let the submitter know if the contribution has been knocked off
       // Can then allow the user to fix
       // at the moment just stoppping invalid data from pushing through
-      if ( ( !( empty( $sHouseNo ) ) ) && ( self::IsPostcode( $formattedPostcode ) ) )
-      {
+      if ( $bValidDonorData ) {
         $aDonors[] = array( 'forename'        => $oDao->first_name
                           , 'surname'         => $oDao->last_name
-                          , 'house_no'        => $sHouseNo
-                          , 'postcode'        => $formattedPostcode //$oDao->postcode
+                          , 'house_no'        => $aAddress['address']
+                          , 'postcode'        => $formattedPostcode
                           , 'date'            => date('Y-m-d', strtotime( $oDao->created_date ) )
                           , 'gift_aid_amount' => $oDao->amount
                           );
+      } else {
+        self::logBadDonorRecord( $oDao->batch_id
+                               , $oDao->batch_name
+                               , $oDao->created_date
+                               , $oDao->contribution_id
+                               , $oDao->contact_id
+                               , $oDao->first_name
+                               , $oDao->last_name
+                               , $oDao->amount
+                               , $oDao->gift_aid_amount
+                               , $aAddress['address']
+                               , $aAddress['postcode']
+                               );
       }
     }
 

@@ -384,9 +384,12 @@ EOD;
 
   private function build_claim_xml( $pBatchId, &$package ) {
     $cClaimOrgName         = $this->_Settings['CLAIMER_ORG_NAME'];
-    $cClaimOrgHmrcref      = $this->_Settings['CLAIMER_ORG_HMRC_REF'];
-    $cRegulatorName        = $this->_Settings['CLAIMER_ORG_REGULATOR_NAME'];
-    $cRegulatorNo          = $this->_Settings['CLAIMER_ORG_REGULATOR_NO'];
+    $cClaimOrgHmrcref      = $this->_Settings['CHAR_ID'];
+//    $cClaimOrgHmrcref      = $this->_Settings['CLAIMER_ORG_HMRC_REF'];
+    $cRegulatorName        = 'CCEW';
+    $cRegulatorNo          = 'A1234';
+//    $cRegulatorName        = $this->_Settings['CLAIMER_ORG_REGULATOR_NAME'];
+//    $cRegulatorNo          = $this->_Settings['CLAIMER_ORG_REGULATOR_NO'];
     $cConnectedCharities   = 'no';
     $cCommBldgs            = 'no';
 

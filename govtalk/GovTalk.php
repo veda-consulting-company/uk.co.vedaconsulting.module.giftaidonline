@@ -1031,7 +1031,7 @@ class GovTalk {
 							$xsiSchemaLocation .= ' '.$this->_additionalXsiSchemaLocation;
 						}
 						$package->writeAttribute('xmlns', 'http://www.govtalk.gov.uk/CM/envelope');
-						$package->writeAttributeNS('xsi', 'schemaLocation', 'http://www.w3.org/2001/XMLSchema-instance', $xsiSchemaLocation);
+//						$package->writeAttributeNS('xsi', 'schemaLocation', 'http://www.w3.org/2001/XMLSchema-instance', $xsiSchemaLocation);
 							$package->writeElement('EnvelopeVersion', '2.0');
 
 	 // Header...
@@ -1044,7 +1044,7 @@ class GovTalk {
 									if ($this->_messageFunction !== null) {
 										$package->writeElement('Function', $this->_messageFunction);
 									}
-									$package->writeElement('TransactionID', $this->_transactionId);
+//									$package->writeElement('TransactionID', $this->_transactionId);
 									if ($this->_messageCorrelationId !== null) {
 										$package->writeElement('CorrelationID', $this->_messageCorrelationId);
 									}else {
@@ -1054,6 +1054,9 @@ class GovTalk {
 										$package->writeElement('Transformation', $this->_messageTransformation);
 									//}
 									$package->writeElement('GatewayTest', $this->_govTalkTest);
+                  if ( $this->_govTalkTest == 1 ) {
+  									$package->writeElement('GatewayTimestamp', date( "Y-m-d H:i:s", time() ) );
+                  }
 								$package->endElement(); # MessageDetails
 
 	 // Sender details...
@@ -1102,16 +1105,19 @@ class GovTalk {
 										$package->endElement(); # Key
 									}
 									$package->endElement(); # Keys
-								}
+								} else {
+                  $package->startElement('Keys');
+                  $package->endElement();
+                }
 
 	 // Target details...
-								if (count($this->_messageTargetDetails) > 0) {
-									$package->startElement('TargetDetails');
-									foreach ($this->_messageTargetDetails AS $targetOrganisation) {
-										$package->writeElement('Organisation', $targetOrganisation);
-									}
-									$package->endElement(); # TargetDetails
-								}
+//								if (count($this->_messageTargetDetails) > 0) {
+//									$package->startElement('TargetDetails');
+//									foreach ($this->_messageTargetDetails AS $targetOrganisation) {
+//										$package->writeElement('Organisation', $targetOrganisation);
+//									}
+//									$package->endElement(); # TargetDetails
+//								}
 
 	 // Channel routing...
 								$channelRouteArray = $this->_messageChannelRouting;
@@ -1146,7 +1152,7 @@ class GovTalk {
 
 	 // Body...
 							$package->startElement('Body');
-							if (is_string($this->_messageBody)) {
+							if ( !empty(  $this->_messageBody ) && is_string( $this->_messageBody ) ) {
 								$package->writeRaw("\n".trim($this->_messageBody)."\n");
 							} else if (is_a($this->_messageBody, 'XMLWriter')) {
 								$package->writeRaw("\n".trim($this->_messageBody->outputMemory())."\n");

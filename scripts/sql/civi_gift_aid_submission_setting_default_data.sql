@@ -64,7 +64,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 , `description`
 ) VALUES
 ( 'CLAIMER_ORG_REGULATOR_NAME'
-, null
+, 'CCEW'
 , 'Abbereviated name of the Regulator belonging the Claiment organisation, for example Charity Comission of England and Wales is CCEW.'
 );
 
@@ -74,7 +74,7 @@ INSERT INTO `civicrm_gift_aid_submission_setting`
 , `description`
 ) VALUES
 ( 'CLAIMER_ORG_REGULATOR_NO'
-, null
+, 'A1234'
 , 'The Regulator Number belonging the Claiment organisation'
 );
 

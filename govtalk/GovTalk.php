@@ -214,7 +214,6 @@ class GovTalk {
 	 * @return boolean True if errors are present, false if not.
 	 */
 	public function responseHasErrors() {
-
 		if (isset($this->_fullResponseObject)) {
 			if (isset($this->_fullResponseObject->GovTalkDetails->GovTalkErrors)) {
 				return true;
@@ -224,7 +223,6 @@ class GovTalk {
 		} else {
 			return false;
 		}
-
 	}
 
  /* System / internal get methods. */
@@ -314,7 +312,6 @@ class GovTalk {
 	 * @return integer The Gateway timestamp as a unix timestamp, or false if this isn't set.
 	 */
 	public function getResponseCorrelationId() {
-
 		if (isset($this->_fullResponseObject)) {
 			if (isset($this->_fullResponseObject->Header->MessageDetails->CorrelationID)) {
 				return (string) $this->_fullResponseObject->Header->MessageDetails->CorrelationID;
@@ -351,7 +348,6 @@ class GovTalk {
 		} else {
 			return false;
 		}
-
 	}
 
 	/**
@@ -381,7 +377,6 @@ class GovTalk {
 		} else {
 			return false;
 		}
-
 	}
 
 	/**
@@ -398,6 +393,23 @@ class GovTalk {
 			return false;
 		}
 
+	}
+
+	/**
+	 * Get the successful response text message.
+	 *
+	 * @return the text successful messages.
+	 */
+	public function getResponseSuccessfullMessage() {
+    $oBody    = $this->getResponseBody();
+    $sMessage = null;
+		if ( $oBody ) {
+			if ( isset( $oBody->SuccessResponse->IRmarkReceipt->Message ) ) {
+				$sMessage = $oBody->SuccessResponse->IRmarkReceipt->Message;
+			}
+		}
+
+    return $sMessage;
 	}
 
  /* General envelope related set methods. */
@@ -1205,10 +1217,8 @@ class GovTalk {
 	 * @return boolean Always returns true.
 	 */
 	private function _generateTransactionId() {
-
-		$this->_transactionId = str_replace('.', '', microtime(true));
+		$this->_transactionId = str_pad( str_replace( '.', '', microtime( true ) ), 32 , '0' );
 		return true;
-
 	}
 
 }

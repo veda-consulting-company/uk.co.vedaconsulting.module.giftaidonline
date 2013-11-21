@@ -483,13 +483,9 @@ EOD;
 	  // Send the message and deal with the response...
     $this->setMessageBody( $package );
 
-    if ($this->sendMessage() && ($this->responseHasErrors() === false)) {
-      return $this;
-    } else {
-      return $this;
-//      return false;
-    }
+    return $this->sendMessage();
   }
+
 	public function declarationResponsePoll( $p_correlation_id = null, $p_poll_url = null ) {
 		if ($p_correlation_id === null) {
 			$sCorrelationId = $this->getResponseCorrelationId();

@@ -139,7 +139,7 @@ EOF;
               , %10
               );
 EOF;
-    $aQueryParam = array( 1   => array( $p_submission_id              , 'Integer' )
+    $aQueryParam = array( 1   => array( $p_submission_id                                                            , 'Integer' )
                         , 2   => array( empty( $p_request_xml                ) ? '' : $p_request_xml                , 'String'  )
                         , 3   => array( empty( $p_response_xml               ) ? '' : $p_response_xml               , 'String'  )
                         , 4   => array( empty( $p_response_qualifier         ) ? '' : $p_response_qualifier         , 'String'  )
@@ -231,25 +231,33 @@ EOF;
     $sQuery      = $this->_get_batch_record_sql( $p_batch_id );
     $oBatchDao   = CRM_Core_DAO::executeQuery( $sQuery );
     if ( $oBatchDao->fetch() ) {
-      $dSubmissionDate   = date('YmdHmi', $p_hmrc_gift_aid->getGatewayTimestamp() );
-      $aEndPoint         = $p_hmrc_gift_aid->getResponseEndpoint();
-      $sEndPointInterval = isset($aEndPoint['interval']) ? $aEndPoint['interval'] : null ;
-      $sUrl              = CRM_Utils_System::url( 'civicrm/onlinesubmission'
-                                         , "id=$p_batch_id"
-                                         );
-      $sRefreshLink      = sprintf( "<a href='%s'>Refresh</a>"
-                           , $sUrl
-                           );
-      $sResponseError  = $this->_response_error_to_string( $p_hmrc_gift_aid->getFullXMLResponse(), '<br /><br />' );
-      $sResponseStatus = sprintf( "<div>Status:<strong>%s</strong></div><div>%s</div>"
-                                , $p_hmrc_gift_aid->getResponseQualifier()
-                                , $sResponseError
-                                );
-      if ( !empty( $aEndPoint ) ) {
-        $sResponseStatus .= sprintf( "<div>Please wait for %s seconds then click on the Refresh link to get an update of the submission.</div><div>[%s]</div>"
-                                , $sEndPointInterval
-                                , $sRefreshLink
-                                );
+      $dSubmissionDate = date('YmdHmi', $p_hmrc_gift_aid->getGatewayTimestamp() );
+      $sSuccessMessage = $p_hmrc_gift_aid->getResponseSuccessfullMessage();
+      $sResponseStatus = null;
+      if ( !empty( $sSuccessMessage ) ) {
+          $sResponseStatus = sprintf( "<div>%s</div>"
+                                  , $sSuccessMessage
+                                  );
+      } else {
+        $aEndPoint         = $p_hmrc_gift_aid->getResponseEndpoint();
+        $sEndPointInterval = isset($aEndPoint['interval']) ? $aEndPoint['interval'] : null ;
+        $sUrl              = CRM_Utils_System::url( 'civicrm/onlinesubmission'
+                                           , "id=$p_batch_id"
+                                           );
+        $sRefreshLink      = sprintf( "<a href='%s'>Refresh</a>"
+                             , $sUrl
+                             );
+        $sResponseError  = $this->_response_error_to_string( $p_hmrc_gift_aid->getFullXMLResponse(), '<br /><br />' );
+        $sResponseStatus = sprintf( "<div>Status:<strong>%s</strong></div><div>%s</div>"
+                                  , $p_hmrc_gift_aid->getResponseQualifier()
+                                  , $sResponseError
+                                  );
+        if ( !empty( $aEndPoint ) ) {
+          $sResponseStatus .= sprintf( "<div>Please wait for %s seconds then click on the Refresh link to get an update of the submission.</div><div>[%s]</div>"
+                                  , $sEndPointInterval
+                                  , $sRefreshLink
+                                  );
+        }
       }
       $aSubmission = array ( 'batch_id'              => $p_batch_id
                            , 'batch_name'            => $oBatchDao->batch_name
@@ -295,6 +303,11 @@ EOF;
     $oHmrcGiftAid = new HmrcGiftAid();
     if ( !$this->is_submitted( $p_batch_id ) ) {
         $oHmrcGiftAid = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
+        if ( $oHmrcGiftAid->responseHasErrors() === false ) {
+          /**
+           * TODO: to handle error in submission.
+           */
+        }
         $dSubmissionDate   = date('YmdHmi', $oHmrcGiftAid->getGatewayTimestamp() );
         $aEndPoint         = $oHmrcGiftAid->getResponseEndpoint();
         $sEndPoint         = isset($aEndPoint['endpoint']) ? $aEndPoint['endpoint'] : null ;

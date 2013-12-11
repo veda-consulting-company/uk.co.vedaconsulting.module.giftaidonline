@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='UTF-8' ?> 
+<?xml version='1.0' encoding='UTF-8' ?> 
 <extension key="uk.co.vedaconsulting.module.giftaidonline" type="module">
   <downloadUrl>https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/archive/v1.3.3.zip</downloadUrl>
   <file>giftaidonline</file>
@@ -15,14 +15,15 @@
     <author>Parvez Saleh</author>
     <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
-  <releaseDate>2013-03-18</releaseDate>
-  <version>1.3.3</version>
+  <releaseDate>2013-12-11</releaseDate>
+  <version>1.4.0</version>
   <develStage>beta</develStage>
   <compatibility>
     <ver>4.2</ver>
 	  <ver>4.3</ver>
+	  <ver>4.4</ver>
   </compatibility>
-  <comments>Beta Release, please confirm the receipt of the submission with the HMRC</comments>
+  <comments>Production Release, please confirm the receipt of the submission with the HMRC</comments>
   <civix>
     <namespace>CRM/Giftaidonline</namespace>
   </civix>

@@ -284,6 +284,7 @@ SQL;
                                     , $gift_aid_amount
                                     , $address
                                     , $postcode
+                                    , $validation_msg
                                     ) {
     $sMessage =<<<EOF
         batch_id: $batch_id
@@ -297,6 +298,7 @@ SQL;
       , gift_aid_amount: $gift_aid_amount
       , address: $address
       , postcode: $postcode
+      , message: $validation_msg
 EOF;
     CRM_Core_Error::debug_log_message( "Invalid Donor Record. Details ...\n$sMessage", TRUE );
   }
@@ -327,6 +329,7 @@ EOD;
     $aAddress['postcode'] = null;
 
     while ( $oDao->fetch() ) {
+      $validationMsg = "";
       $bValidDonorData = self::isValidPersonName( $oDao->first_name ) && self::isValidPersonName( $oDao->last_name );
       if ( $bValidDonorData ) {
         $aAddress  = self::getDonorAddress( $oDao->contact_id
@@ -338,7 +341,10 @@ EOD;
         $bValidAddress = !( empty( $aAddress['address'] ) ) && self::IsPostcode( $formattedPostcode ) ;
         if ( !$bValidAddress ) {
           $bValidDonorData = false;
+          $validationMsg = "INVALID DONOR DETAILS : ADDRESS DATA ";
         }
+      } else {
+        $validationMsg = "INVALID DONOR DETAILS : FIRST NAME OR LAST NAME MISSING ";
       }
 
       // Need to find a way to let the submitter know if the contribution has been knocked off
@@ -364,6 +370,7 @@ EOD;
                                , $oDao->gift_aid_amount
                                , $aAddress['address']
                                , $aAddress['postcode']
+                               , $validationMsg
                                );
       }
     }

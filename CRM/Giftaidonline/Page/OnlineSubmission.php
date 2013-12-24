@@ -302,7 +302,10 @@ EOF;
   function process_batch ( $p_batch_id )   {
     $oHmrcGiftAid = new HmrcGiftAid();
     if ( !$this->is_submitted( $p_batch_id ) ) {
-        $oHmrcGiftAid = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
+        // imacdonal Patch 
+        // $oHmrcGiftAid = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
+        $submitResponse = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
+        
         if ( $oHmrcGiftAid->responseHasErrors() === false ) {
           /**
            * TODO: to handle error in submission.

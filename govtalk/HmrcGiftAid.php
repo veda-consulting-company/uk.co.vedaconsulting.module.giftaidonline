@@ -649,9 +649,16 @@ EOD;
 			$packageSimpleXML = simplexml_load_string( $package );
 			$packageNamespaces = $packageSimpleXML->getNamespaces();
 
+      /* Replaced by iMacdonald Patch
 			preg_match('/<Body>(.*?)<\/Body>/', str_replace("\n", '¬', $package), $matches);
 			$packageBody = str_replace('¬', "\n", $matches[1]);
-
+      
+       * Described as
+       * That preg_match function will not match anything if $package contains any UTF-8 characters such as accented characters. Thus, the 'u' modifier to the regular expression is necessary to make preg_match UTF-8 compatible. The str_replace functions are being used so that the preg_match that looks for all the content between the body tags despite the presence of new lines. The newlines are being replaced with '¬', then preg_match runs, then those characters are being converted back to newline characters. It seems better to just give the regular expression the 's' modifier, which will make the dot character match all characters, including newlines. Then the substitutions are is no longer necessary.
+      */
+      preg_match('/<Body>(.*)<\/Body>/su', $package, $matches);
+      $packageBody = $matches[1];
+      
 			$irMark = base64_encode($this->_generateIRMark($packageBody, $packageNamespaces));
 			$package = str_replace('IRmark+Token', $irMark, $package);
 		}

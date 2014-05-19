@@ -300,7 +300,23 @@ SQL;
       , postcode: $postcode
       , message: $validation_msg
 EOF;
+    
     CRM_Core_Error::debug_log_message( "Invalid Donor Record. Details ...\n$sMessage", TRUE );
+
+    // Remove the contribution from the Batch
+    $cEntityDelete = <<<EOD
+      DELETE FROM civicrm_entity_batch
+      WHERE batch_id = %1
+      AND entity_id = %2
+      AND entity_table = 'civicrm_contribution'
+EOD;
+    $aQueryParam          = array( 1 => array( $batch_id, 'Integer' )
+                                 , 2 => array( $contribution_id, 'Integer' ));
+    $oDao                 = CRM_Core_DAO::executeQuery( $cEntityDelete, $aQueryParam );
+
+    // hook to carry out other actions on removal of contribution from a gift aid online batch
+    Giftaidonline_Utils_Hook::invalidGiftAidOnlineContribution( $batch_id, $contribution_id );
+    
   }
 
   private function build_giftaid_donors_xml( $pBatchId, &$package ) {

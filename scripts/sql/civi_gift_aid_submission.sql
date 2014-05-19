@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_gift_aid_submission` (
 `response_end_point_interval` int(3),
 `response_correlation_id`     varchar(255),
 `transaction_id`              varchar(255),
+`IRMark`                      varchar(255),
 `gateway_timestamp`           timestamp,
 PRIMARY KEY  (`id`),
 KEY `batch_id` (`batch_id`)

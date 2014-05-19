@@ -235,9 +235,12 @@ EOF;
       $sSuccessMessage = $p_hmrc_gift_aid->getResponseSuccessfullMessage();
       $sResponseStatus = null;
       if ( !empty( $sSuccessMessage ) ) {
-          $sResponseStatus = sprintf( "<div>%s</div>"
+        $sResponseStatus = sprintf( "<div>%s</div>"
                                   , $sSuccessMessage
                                   );
+        // hook to carry out other actions on success submission
+        Giftaidonline_Utils_Hook::giftAidOnlineSubmitted( $p_batch_id );
+
       } else {
         $aEndPoint         = $p_hmrc_gift_aid->getResponseEndpoint();
         $sEndPointInterval = isset($aEndPoint['interval']) ? $aEndPoint['interval'] : null ;

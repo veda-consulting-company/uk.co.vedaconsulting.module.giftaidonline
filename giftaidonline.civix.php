@@ -9,6 +9,7 @@ function _giftaidonline_db_setup( $bIsUpgrading ) {
       CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, sprintf( "%scivi_gift_aid_submission_setting.sql", $sDbScriptsDir ) );
       CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, sprintf( "%scivi_gift_aid_submission_setting_default_data.sql", $sDbScriptsDir ) );      
       CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, sprintf( "%scivi_gift_aid_polling_request.sql", $sDbScriptsDir ) );      
+      CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, sprintf( "%scivi_gift_aid_rejected_contributions.sql", $sDbScriptsDir ) );
     } 
 }
 /**

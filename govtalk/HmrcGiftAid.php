@@ -302,6 +302,27 @@ SQL;
 EOF;
     
     CRM_Core_Error::debug_log_message( "Invalid Donor Record. Details ...\n$sMessage", TRUE );
+    
+    $sSql =<<<EOF
+            INSERT INTO civi_gift_aid_rejected_contributions(
+              batch_id
+            , contribution_id
+            , rejection_reason
+            ) VALUES (
+              %1
+            , %2
+            , %3
+            );
+EOF;
+    $aQueryParam = array( 1   => array( $p_batch_id, 'Integer' )
+                        , 2   => array( $contribution_id, 'Integer' )
+                        , 3   => array( empty( $validation_msg                ) ? '' : $validation_msg               , 'String'  )
+                        );
+
+    $oDao = CRM_Core_DAO::executeQuery( $sSql, $aQueryParam );
+    if ( is_a( $oDao, 'DB_Error' ) ) {
+      CRM_Core_Error::fatal( 'Trying to create a new Submission record failed.' );
+    }        
 
     // Remove the contribution from the Batch
     $cEntityDelete = <<<EOD
@@ -312,6 +333,7 @@ EOF;
 EOD;
     $aQueryParam          = array( 1 => array( $batch_id, 'Integer' )
                                  , 2 => array( $contribution_id, 'Integer' ));
+    
     $oDao                 = CRM_Core_DAO::executeQuery( $cEntityDelete, $aQueryParam );
 
     // hook to carry out other actions on removal of contribution from a gift aid online batch
@@ -438,7 +460,7 @@ EOD;
     $cOrganisation         = 'IR';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
-    $cClientProductVersion = '1.3.3 beta'; // We should get this from the info.xml
+    $cClientProductVersion = '1.4.1 Production'; // We should get this from the info.xml
     $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
     $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';

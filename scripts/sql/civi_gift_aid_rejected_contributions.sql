@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `civi_gift_aid_rejected_contributions` (
+CREATE TABLE IF NOT EXISTS `civicrm_gift_aid_rejected_contributions` (
 `id`                          int(10) unsigned NOT NULL auto_increment,
 `batch_id`                    int(10) unsigned NOT NULL,
 `contribution_id`             int(10) unsigned NOT NULL,

@@ -304,7 +304,7 @@ EOF;
     CRM_Core_Error::debug_log_message( "Invalid Donor Record. Details ...\n$sMessage", TRUE );
     
     $sSql =<<<EOF
-            INSERT INTO civi_gift_aid_rejected_contributions(
+            INSERT INTO civicrm_gift_aid_rejected_contributions(
               batch_id
             , contribution_id
             , rejection_reason

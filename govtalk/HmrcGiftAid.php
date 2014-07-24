@@ -314,7 +314,7 @@ EOF;
             , %3
             );
 EOF;
-    $aQueryParam = array( 1   => array( $p_batch_id, 'Integer' )
+    $aQueryParam = array( 1   => array( $batch_id, 'Integer' )
                         , 2   => array( $contribution_id, 'Integer' )
                         , 3   => array( empty( $validation_msg                ) ? '' : $validation_msg               , 'String'  )
                         );
@@ -337,7 +337,7 @@ EOD;
     $oDao                 = CRM_Core_DAO::executeQuery( $cEntityDelete, $aQueryParam );
 
     // hook to carry out other actions on removal of contribution from a gift aid online batch
-    Giftaidonline_Utils_Hook::invalidGiftAidOnlineContribution( $batch_id, $contribution_id );
+    CRM_Giftaidonline_Utils_Hook::invalidGiftAidOnlineContribution( $batch_id, $contribution_id );
     
   }
 

@@ -93,7 +93,7 @@ EOF;
                         , 7   => array( empty( $p_response_end_point_interval ) ? '' : $p_response_end_point_interval, 'String'  )
                         , 8   => array( empty( $p_response_correlation_id     ) ? '' : $p_response_correlation_id    , 'String'  )
                         , 9   => array( empty( $p_transaction_id              ) ? '' : $p_transaction_id             , 'String'  )
-                        , 10  => array( empty( $p_gateway_timestamp           ) ? '' : $p_gateway_timestamp          , 'String'  )
+                        , 10  => array( empty( $p_gateway_timestamp           ) ? '' : date( "Y-m-d H:i:s", $p_gateway_timestamp)          , 'String'  )
                         );
 
     $oDao = CRM_Core_DAO::executeQuery( $sSql, $aQueryParam );
@@ -148,7 +148,7 @@ EOF;
                         , 7   => array( empty( $p_response_end_point_interval) ? '' : $p_response_end_point_interval, 'String'  )
                         , 8   => array( empty( $p_response_correlation_id    ) ? '' : $p_response_correlation_id    , 'String'  )
                         , 9   => array( empty( $p_transaction_id             ) ? '' : $p_transaction_id             , 'String'  )
-                        , 10  => array( empty( $p_gateway_timestamp          ) ? '' : $p_gateway_timestamp          , 'String'  )
+                        , 10  => array( empty( $p_gateway_timestamp          ) ? '' : date( "Y-m-d H:i:s", $p_gateway_timestamp)          , 'String'  )
                         );
 
     $oDao = CRM_Core_DAO::executeQuery( $sSql, $aQueryParam );
@@ -239,7 +239,7 @@ EOF;
                                   , $sSuccessMessage
                                   );
         // hook to carry out other actions on success submission
-        Giftaidonline_Utils_Hook::giftAidOnlineSubmitted( $p_batch_id );
+        CRM_Giftaidonline_Utils_Hook::giftAidOnlineSubmitted( $p_batch_id );
 
       } else {
         $aEndPoint         = $p_hmrc_gift_aid->getResponseEndpoint();

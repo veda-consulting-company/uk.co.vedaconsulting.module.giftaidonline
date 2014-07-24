@@ -34,7 +34,7 @@
  *
  */
 
-abstract class Giftaidonline_Utils_Hook {
+abstract class CRM_Giftaidonline_Utils_Hook {
 
 	static $_nullObject = null;
 
@@ -63,7 +63,7 @@ abstract class Giftaidonline_Utils_Hook {
     }
     
     abstract function invoke( $numParams,
-                              &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
+                              &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
                               $fnSuffix );
 
     /**
@@ -76,7 +76,7 @@ abstract class Giftaidonline_Utils_Hook {
      * @access public
      */
     static function giftAidOnlineSubmitted( $batchID ) {
-		return self::singleton( )->invoke( 1, $batchID, self::$_nullObject, 'civicrm_giftAidOnlineSubmitted' );       
+		return self::singleton( )->invoke( 1, $batchID, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_giftAidOnlineSubmitted' );
     }
 
     /**
@@ -86,7 +86,7 @@ abstract class Giftaidonline_Utils_Hook {
      * @access public
      */
     static function invalidGiftAidOnlineContribution( $batchID, $contributionIDRemoved ) {
-		return self::singleton( )->invoke( 2, $batchID, $contributionIDRemoved, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_invalidGiftAidOnlineContribution' );
+		return self::singleton( )->invoke( 2, $batchID, $contributionIDRemoved, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_invalidGiftAidOnlineContribution' );
     }
     
 }

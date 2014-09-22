@@ -1,0 +1,43 @@
+OnlineGiftAidSubmission Extension for CiviCRM 4.2+
+-------------------------------------------
+
+Installation
+
+Install CiviCRM v4.4. Note that this extension does not work with previous versions of CiviCRM.
+
+Create and set the extensions directory in CiviCRM
+
+Download this extension in the above directory.
+
+Install this extension in CiviCRM on q=civicrm/admin/extensions?reset=1
+
+For information about the latest improvements, please visit: http://www.vedaconsulting.co.uk/uk-hrmc-gift-aid-online-submission/
+
+-------------------------------------------
+v1.5.2
+-------------------------------------------
+Introduced two new hooks
+
+giftAidOnlineSubmitted( $batchID )
+Used if you want to perform an action following successful submission i.e. update another table, send an email etc
+
+invalidGiftAidOnlineContribution( $batchID, $contributionIDRemoved )
+Used when contributions aren't submitted due to not meeting gift aid online rules i.e. invalid postcode formats or address lines etc
+
+Also added a new column to the civicrm_gift_aid_submission table
+Suggest if your upgrading you add this in manually
+
+ALTER TABLE `civicrm_gift_aid_submission` ADD COLUMN `IRMark` varchar(255);
+
+This column will hold the IR Mark of successfully submitted claims
+
+There is also a new table that holds contributions that were classed as invalid pre-submission and this also needs to be created if your upgrading
+
+The script is in scripts/sql/civi_gift_aid_rejected_contributions
+
+
+
+
+
+
+

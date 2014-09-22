@@ -55,7 +55,7 @@ function _giftaidonline_civix_civicrm_install() {
     _giftaidonline_db_setup( true );
     return $upgrader->onInstall();
   }
-  _giftaidonline_db_setup( false );
+  _giftaidonline_db_setup( TRUE );
 }
 
 /**

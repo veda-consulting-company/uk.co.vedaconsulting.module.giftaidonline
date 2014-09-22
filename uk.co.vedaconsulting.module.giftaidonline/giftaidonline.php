@@ -5,6 +5,9 @@ require_once 'giftaidonline.civix.php';
 /**
  * Implementation of hook_civicrm_config
  */
+define('title', 'GiftAidOnlineRejectionReason');
+define('report_id', 'civicrm/contribute/giftaidonline');
+
 function giftaidonline_civicrm_config(&$config) {
   _giftaidonline_civix_civicrm_config($config);
 }
@@ -36,7 +39,7 @@ function giftaidonline_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function giftaidonline_civicrm_enable() {
-  return _giftaidonline_civix_civicrm_enable();
+   return _giftaidonline_civix_civicrm_enable();
 }
 
 /**

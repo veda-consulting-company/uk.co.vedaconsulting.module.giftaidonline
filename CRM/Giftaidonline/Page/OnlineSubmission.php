@@ -305,10 +305,10 @@ EOF;
   function process_batch ( $p_batch_id )   {
     $oHmrcGiftAid = new HmrcGiftAid();
     if ( !$this->is_submitted( $p_batch_id ) ) {
-        // imacdonal Patch 
+        // imacdonal Patch
         // $oHmrcGiftAid = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
         $submitResponse = $oHmrcGiftAid->giftAidSubmit( $p_batch_id );
-        
+
         if ( $oHmrcGiftAid->responseHasErrors() === false ) {
           /**
            * TODO: to handle error in submission.
@@ -363,6 +363,17 @@ EOF;
     $cQuery   = $this->_get_batch_record_sql();
     $oDao     = CRM_Core_DAO::executeQuery( $cQuery );
     $aBatches = array();
+
+    // Get report instance
+    $params = array(
+      'version' => 3,
+      'report_id' => GIFTAID_FAILURE_REPORT_ID,
+    );
+    $result = civicrm_api('ReportInstance', 'getsingle', $params);
+    if (!empty($result['id'])) {
+      $reportUrl = 'civicrm/report/instance/'.$result['id'];
+    }
+
     while ( $oDao->fetch() ) {
       if ( !$this->is_submitted ( $oDao->batch_id ) ) {
         $sUrl  = CRM_Utils_System::url( 'civicrm/onlinesubmission'
@@ -382,12 +393,23 @@ EOF;
                         );
       }
 
+      $reportLink = '';
+      if (!empty($reportUrl)) {
+        $rLink = CRM_Utils_System::url( $reportUrl
+                                      , "batch_id=$oDao->batch_id&force=1&reset=1"
+                                      );
+        $reportLink = sprintf( "<a href='%s'>View</a>"
+                        , $rLink
+                        );
+      }
+
       $aBatches[] = array ( 'batch_id'              => $oDao->batch_id
                           , 'batch_name'            => $oDao->batch_name
                           , 'created_date'          => $oDao->created_date
                           , 'total_amount'          => $oDao->total_amount
                           , 'total_gift_aid_amount' => $oDao->total_gift_aid_amount
                           , 'action'                => $cLink
+                          , 'report_link'           => $reportLink
                           );
     }
 

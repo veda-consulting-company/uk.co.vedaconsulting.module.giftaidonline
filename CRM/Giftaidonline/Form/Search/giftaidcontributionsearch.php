@@ -22,8 +22,8 @@ class CRM_Giftaidonline_Form_Search_giftaidcontributionsearch extends CRM_Contac
       2 => ts('All Claims'),
     );
     $form->addRadio('contribution_claim', ts("Contributions that aren't Claimed"), $activityRoles);
-    $form->addDate( 'start_date', ts('From'), false, array( 'formatType' => 'custom' ) );
-    $form->addDate( 'end_date', ts('To'), false, array( 'formatType' => 'custom' ) );
+    $form->addDate( 'start_date', ts('Start Date : '), false, array( 'formatType' => 'custom' ) );
+    $form->addDate( 'end_date', ts('End Date : '), false, array( 'formatType' => 'custom' ) );
     
 
     // Optionally define default search values

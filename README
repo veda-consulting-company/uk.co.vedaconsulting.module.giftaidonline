@@ -35,6 +35,42 @@ There is also a new table that holds contributions that were classed as invalid 
 
 The script is in scripts/sql/civi_gift_aid_rejected_contributions
 
+-------------------------------------------
+v1.6
+-------------------------------------------
+
+Introduced 2 new features
+
+1. GiftAid Online Failure report - To view the rejection reason for the GiftAid Online Submission
+2. GiftAid Contribution Custom search - To search for contributions which are not claimed and those with valid declaration.
+
+If you are doing new installation, skip Step 1 and 2 and go to Step 3.
+
+If you are upgrading, you must do all 3 steps. 
+
+Note: If you are upgrading from version prior to v1.5.2, run the ALTER table mentioned in the section above.
+
+Step 1: Register report (Only for upgrade)
+Title: giftaidonlinefailure (uk.co.vedaconsulting.module.giftaidonline)
+Description: GiftAid Online Failure Report
+Report URL: uk.co.vedaconsulting.module.giftaidonline/giftaidonlinefailure
+Class Name: CRM_Giftaidonline_Form_Report_giftaidonlinefailure
+Component: CiviContribute
+
+Step 2: Register Custom Search (Only for upgrade)
+Navigate to Administer >> Customize Data & Screens >> Manage Custom Searches
+Click 'Add Custom Search'
+Enter the below values in the form and click 'Save'
+Custom Search Path: CRM_Giftaidonline_Form_Search_giftaidcontributionsearch
+Search Title: giftaidcontributionsearch (uk.co.vedaconsulting.module.giftaidonline)
+
+Step 3: Create report instance (New Install and Upgrade)
+Navigate to Administer >> CiviReport >> Create New Report from Template
+Click 'giftaidonlinefailure' under 'Contribution Report Templates'
+Review the Display Columns section. Not to worry about the Filter, as batch ID will be passed to the report from Online Gift Aid Submission page
+Click 'Preview Report' button
+Under 'Create Report' section, give a report title and set the permissions and click 'Create Report' button. You dont need to include report in navigation menu, as the report link will be displayed in Online Gift Aid Submission page for each batch.
+
 
 
 

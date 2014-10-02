@@ -326,20 +326,18 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
                 foreach ($row as $colName => $colVal) {
                     if(isset($_GET['batch_id'])){
                         $bId = $_GET['batch_id'];
-                        $cId = $row ['civicrm_contribution_id'];
                         $checkList[$colName][] = $colVal;
                         $sQuery = "SELECT GROUP_CONCAT( DISTINCT {$this->_aliases['civicrm_gift_aid_rejected_contributions']}.rejection_reason SEPARATOR '<br>')as gift_rejection_reason FROM civicrm_gift_aid_rejected_contributions {$this->_aliases['civicrm_gift_aid_rejected_contributions']}
-                                   WHERE batch_id = ".$bId." AND contribution_id = ".$cId;
+                                   WHERE batch_id = ".$bId;
                         $dao = crm_core_dao::executeQuery($sQuery);
                         $dao->fetch();
                         $rReason = $dao->gift_rejection_reason;
                         $rows[$rowNum]['civicrm_gift_aid_rejected_contributions_rejection_reason'] = $rReason; 
                         }elseif (!isset($_GET['batch_id'])) {
                             $batchId = $row['civicrm_gift_aid_rejected_contributions_batch_id'];
-                            $contributionId = $row ['civicrm_gift_aid_rejected_contributions_contribution_id'];
                             $checkList[$colName][] = $colVal;
                             $sQuery = "SELECT GROUP_CONCAT( DISTINCT {$this->_aliases['civicrm_gift_aid_rejected_contributions']}.rejection_reason SEPARATOR '<br>')as gift_rejection_reasion FROM civicrm_gift_aid_rejected_contributions {$this->_aliases['civicrm_gift_aid_rejected_contributions']}
-                                       WHERE batch_id = ".$batchId." AND contribution_id = ".$contributionId;
+                                       WHERE batch_id = ".$batchId;
                             $dao = crm_core_dao::executeQuery($sQuery);
                             $dao->fetch();
                             $rReason = $dao->gift_rejection_reasion;

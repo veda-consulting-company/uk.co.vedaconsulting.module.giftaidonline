@@ -460,7 +460,7 @@ EOD;
     $cOrganisation         = 'IR';
     $cClientUri            = $this->_Settings['VENDOR_ID'];
     $cClientProduct        = 'VedaGiftAidSubmission';
-    $cClientProductVersion = '1.5.1 Production'; // We should get this from the info.xml
+    $cClientProductVersion = '1.6 Production'; // We should get this from the info.xml
     $dReturnPeriod         = $this->_Settings['PERIOD_END']; //'2013-03-31';
     $sDefaultCurrency      = 'GBP';
     $sSender               = $this->_Settings['SENDER_TYPE']; //'Individual';

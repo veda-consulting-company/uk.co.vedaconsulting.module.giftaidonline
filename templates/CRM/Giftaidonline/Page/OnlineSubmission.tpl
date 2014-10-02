@@ -12,7 +12,7 @@
                 <th>Total</th>
                 <th>Gift Aid Amount</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Rejection Report</th>
             </tr>
         </thead>
         <tbody>
@@ -23,7 +23,7 @@
                     <td>{$batch.total_amount}</td>
                     <td>{$batch.total_gift_aid_amount}</td>
                     <td>{$batch.action}</td>
-                    <td><a href="{crmURL p='civicrm/report/civicrm/contribute/giftaidonline' q="reset=1&force=1&batch_id=`$batch.batch_id`"}">Rejection Report</a> </td></a>
+                    <td>{$batch.report_link}</td>
                 </tr>
             {/foreach}
         </tbody>

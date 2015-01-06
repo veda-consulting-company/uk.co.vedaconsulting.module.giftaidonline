@@ -71,9 +71,15 @@ Review the Display Columns section. Not to worry about the Filter, as batch ID w
 Click 'Preview Report' button
 Under 'Create Report' section, give a report title and set the permissions and click 'Create Report' button. You dont need to include report in navigation menu, as the report link will be displayed in Online Gift Aid Submission page for each batch.
 
+-------------------------------------------
+v1.6.1
+-------------------------------------------
 
+Change permission who can submit the batches to HMRC
 
+'allow giftaid submission' is added to permission list.
 
+Make sure the role has the above permission in place in order to submit the batches to HMRC. 
 
 
 

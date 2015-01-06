@@ -4,14 +4,14 @@
     <path>civicrm/onlinesubmission</path>
     <page_callback>CRM_Giftaidonline_Page_OnlineSubmission</page_callback>
     <title>Gift Aid Online Submission</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>allow giftaid submission</access_arguments>
     <page_type>1</page_type>
   </item>
   <item>
     <path>civicrm/poll-online-submission</path>
     <page_callback>CRM_Giftaidonline_Page_OnlineSubmission</page_callback>
     <title>Poll Gift Aid Online Submission</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>allow giftaid submission</access_arguments>
     <page_type>1</page_type>
   </item>
   <item>

@@ -77,3 +77,14 @@ function giftaidonline_civicrm_managed(&$entities) {
 function giftaidonline_civicrm_navigationMenu( &$params ) {
   return _giftaidonline_civicrm_navigationMenu( $params );
 }
+
+/**
+ *Implementation of hook_civicrm_permission
+ * @param array $permissions
+ */
+function giftaidonline_civicrm_permission( &$permissions ) {
+  $prefix = ts('Giftaidonline') . ': '; // name of extension or module
+  $permissions = array(
+    'allow giftaid submission' => $prefix . ts('allow giftaid submission'),
+  );
+}

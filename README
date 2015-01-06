@@ -75,11 +75,11 @@ Under 'Create Report' section, give a report title and set the permissions and c
 v1.6.1
 -------------------------------------------
 
-Introduced one new feature
+Change permission who can submit the batches to HMRC
 
-1. New permission called 'allow giftaid submission' is added to online submission.
-Make sure the person has the above permission in place in order to submit the batches to HMRC. 
+'allow giftaid submission' is added to permission list.
 
+Make sure the role has the above permission in place in order to submit the batches to HMRC. 
 
 
 

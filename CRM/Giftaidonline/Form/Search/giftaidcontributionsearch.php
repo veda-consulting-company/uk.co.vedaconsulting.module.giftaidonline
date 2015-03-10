@@ -110,7 +110,7 @@ SELECT;
   function from() {
     return "
       FROM civicrm_contribution contribution 
-      LEFT JOIN civicrm_value_gift_aid_submission submission ON ( contribution.id = submission.entity_id )
+      /*LEFT JOIN civicrm_value_gift_aid_submission submission ON ( contribution.id = submission.entity_id )*/
       LEFT JOIN civicrm_contact contact_a ON ( contact_a.id = contribution.contact_id )
       LEFT JOIN civicrm_value_gift_aid_declaration declaration ON (declaration.entity_id = contact_a.id ) 
     ";

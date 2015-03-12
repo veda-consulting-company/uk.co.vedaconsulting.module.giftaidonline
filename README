@@ -81,5 +81,9 @@ Change permission who can submit the batches to HMRC
 
 Make sure the role has the above permission in place in order to submit the batches to HMRC. 
 
+-------------------------------------------
+v1.6.2
+-------------------------------------------
 
+Amended custom search to use contribution dates and not declaration dates as this is not as useful
 

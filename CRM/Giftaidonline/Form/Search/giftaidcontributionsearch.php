@@ -65,11 +65,10 @@ class CRM_Giftaidonline_Form_Search_giftaidcontributionsearch extends CRM_Contac
   function &columns() {
     // return by reference
     $columns = array(
-      ts('Contact Id')      => 'contact_id',
-      ts('Name')            => 'sort_name',
-      ts('Contribution Id') => 'contribution_id',
-      ts('Start Date')      => 'start_date',
-      ts('End Date')        => 'end_date',
+      ts('Contact Id')        => 'contact_id',
+      ts('Contact Name')      => 'display_name',
+      ts('Contribution Id')   => 'contribution_id',
+      ts('Contribution Date') => 'receive_date',
     );
     return $columns;
   }
@@ -82,8 +81,8 @@ class CRM_Giftaidonline_Form_Search_giftaidcontributionsearch extends CRM_Contac
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     $sql = $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
-//    print_r($sql);
-//    die();
+    //print_r($sql);
+    //die();
     return $sql;
   }
 
@@ -95,10 +94,9 @@ class CRM_Giftaidonline_Form_Search_giftaidcontributionsearch extends CRM_Contac
   function select() {
     $select =<<<SELECT
       contact_a.id           as contact_id,
-      contact_a.sort_name    as sort_name,
+      contact_a.display_name    as display_name,
       contribution.id        as contribution_id,
-      declaration.start_date as start_date,
-      declaration.end_date   as end_date
+      contribution.receive_date as receive_date
 SELECT;
     
     return $select;
@@ -111,8 +109,8 @@ SELECT;
    */
   function from() {
     return "
-      FROM civicrm_value_gift_aid_submission submission
-      LEFT JOIN civicrm_contribution contribution ON ( contribution.id = submission.entity_id )
+      FROM civicrm_contribution contribution 
+      /*LEFT JOIN civicrm_value_gift_aid_submission submission ON ( contribution.id = submission.entity_id )*/
       LEFT JOIN civicrm_contact contact_a ON ( contact_a.id = contribution.contact_id )
       LEFT JOIN civicrm_value_gift_aid_declaration declaration ON (declaration.entity_id = contact_a.id ) 
     ";
@@ -133,19 +131,19 @@ SELECT;
       'name'            => 'Gift Aid',
     );
     $batchOptionValues = civicrm_api('OptionValue', 'getsingle', $apiParams);
-    $batchTypeId = 3; 
 
+    $batchTypeWhereClause = $batchTypeTableJoin = '';
     if(!civicrm_error($batchOptionValues)){
       $batchTypeId = $batchOptionValues['value'];
+      $batchTypeTableJoin = "INNER JOIN civicrm_batch batch ON ( entity_batch.batch_id = batch.id )";
+      $batchTypeWhereClause = " AND batch.type_id = {$batchTypeId}";
     }
     
     $where  =<<<WHERE
     contribution.id NOT IN 
-      ( Select entity_batch.entity_id 
-        From civicrm_entity_batch entity_batch
-        JOIN civicrm_batch batch ON ( entity_batch.batch_id = batch.id )
-        Where entity_table = 'civicrm_contribution' 
-          AND batch.type_id = {$batchTypeId}
+      ( SELECT entity_batch.entity_id 
+        FROM civicrm_entity_batch entity_batch {$batchTypeTableJoin}
+        WHERE entity_table = 'civicrm_contribution' {$batchTypeWhereClause} 
        )
 WHERE;
 
@@ -156,16 +154,18 @@ WHERE;
     if ($claim != NULL && $claim == 1 ) {
       $params[$count] = array(1, 'Integer');
       $clause[] = "declaration.eligible_for_gift_aid = %{$count}";
+      $clause[] = "declaration.start_date <= contribution.receive_date";
+      $clause[] = "(declaration.end_date IS NULL OR declaration.end_date >= contribution.receive_date)";
       $count++;
     }
     
     $startDate = CRM_Utils_Array::value('start_date', $this->_formValues);
     if( $startDate ){
-      $clause[] = "declaration.start_date >= '".date('Y-m-d H:i:s', strtotime($startDate))."'";
+      $clause[] = "contribution.receive_date >= '".date('Y-m-d H:i:s', strtotime($startDate))."'";
     }
     $endDate = CRM_Utils_Array::value('end_date', $this->_formValues);
     if( $endDate ){
-      $clause[] = "declaration.end_date IS NOT NULL AND declaration.end_date <= '".date('Y-m-d H:i:s', strtotime($endDate))."'";
+      $clause[] = "contribution.receive_date <= '".date('Y-m-d H:i:s', strtotime($endDate))."'";
     }
 
     if (!empty($clause)) {
@@ -192,6 +192,6 @@ WHERE;
    * @return void
    */
   function alterRow(&$row) {
-    $row['sort_name'] .= ' ( altered )';
+    $row['contribution_id'] = "<a href='".CRM_Utils_System::url('civicrm/contact/view/contribution', 'id='.$row['contribution_id'].'&cid='.$row['contact_id'].'&reset=1&action=view&context=contribution&selectedChild=contribute')."'>{$row['contribution_id']}</a>";
   }
 }

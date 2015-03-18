@@ -319,6 +319,11 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
         $entryFound = FALSE;
         $checkList = array();
         foreach ($rows as $rowNum => $row) {
+            /* PS 18032015
+             * Commented out this code
+             * Was causing duplicates messages for all contacts showing rejections
+             * The report is supposed to support finding all rejections per contact but doesnt seem to at the moment
+             * This requirement is to allow charities to focus on the highest reward i.e. if a person has given 1k GBP and we cant claim we should focus on them over someone who's give 1GBP
             if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
                 // not repeat contact display names if it matches with the one
                 // in previous row
@@ -368,6 +373,8 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
                     } 
                 } 
             }
+             * PS 18032015 End of Comment
+             */
             if (array_key_exists('civicrm_membership_membership_type_id', $row)) {
                 if ($value = $row['civicrm_membership_membership_type_id']) {
                     $rows[$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($value, FALSE);

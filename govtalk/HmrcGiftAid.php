@@ -203,7 +203,7 @@ EOD;
               LIMIT  1
 SQL;
       $aParams = array( 1 => array( $p_contact_id               , 'Integer' )
-                      , 2 => array( $p_contribution_receive_date, 'Date'    )
+                      , 2 => array( $p_contribution_receive_date, 'Timestamp'    )
                       );
     } else {
       $sSql =<<<SQL
@@ -372,7 +372,7 @@ EOD;
       if ( $bValidDonorData ) {
         $aAddress  = self::getDonorAddress( $oDao->contact_id
                                           , $oDao->contribution_id
-                                          , date('Ymd', strtotime( $oDao->created_date ) ) );
+                                          , date('YmdHis', strtotime( $oDao->created_date ) ) );
         // Need to clean up the postcode before we can submit it
         $formattedPostcode = self::postcodeFormat( $aAddress['postcode'] );
 

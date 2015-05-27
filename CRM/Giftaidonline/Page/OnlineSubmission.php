@@ -273,7 +273,13 @@ EOF;
   function allow_resubmission( $p_batch_id ) {
     $allowResubmission = false;
     $aSubmission  = $this->_get_submission( $p_batch_id );
-    $allowResubmission = ( $aSubmission['response_qualifier'] == 'error' && !empty($aSubmission['response_errors'])) ? true : false;
+    $pRequest = $this->_get_polling_request( $aSubmission['id'] );
+    if ($aSubmission['response_qualifier'] == 'error' && !empty($aSubmission['response_errors'])) {
+      $allowResubmission = true;
+    }
+    if (!empty($pRequest) && $pRequest['response_qualifier'] == 'error') {
+      $allowResubmission = true; 
+    }
     return $allowResubmission;
   }
 
@@ -457,8 +463,16 @@ EOF;
         if ( $this->allow_resubmission($oDao->batch_id) ) {
           $sQueryStr = "id=$oDao->batch_id&task=RESUBMIT";
           $linkLabel = 'Re-Submit now';
+          // Get submission response error
+          if ($aSubmission['response_qualifier'] == 'error') {
+            $responseErrors = $aSubmission['response_xml'];  
+          }
 
-          $responseErrors = $aSubmission['response_xml'];
+          // Get response error from polling, if available (as polling reponse is the latest)
+          if (!empty($pRequest) && $pRequest['response_qualifier'] == 'error') {
+            $responseErrors = $pRequest['response_xml'];  
+          }
+          
         } else {
           $sQueryStr = "id=$oDao->batch_id&task=POLL";
           $linkLabel = 'Get new status';
@@ -467,7 +481,7 @@ EOF;
         if (isset($pRequest['response_qualifier']) && $pRequest['response_qualifier'] == 'response') {
           $sQueryStr = '';
           $linkLabel = '';
-          $responseMessage = $aSubmission['response_xml'];
+          $responseMessage = $pRequest['response_xml'];
         } 
         if (!empty($sQueryStr)) {
           $sUrl  = CRM_Utils_System::url( 'civicrm/onlinesubmission'

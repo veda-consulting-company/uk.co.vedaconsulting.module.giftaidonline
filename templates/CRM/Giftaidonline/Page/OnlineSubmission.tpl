@@ -51,10 +51,10 @@
                     return false;
                 }
             });
-            cj('.errorLink').click( function() {
+            cj("#batch_table").on("click", ".errorLink", function() {
                 displayMessage(cj(this).attr('id'), '#errorMessage_');
             });
-             cj('.responseLink').click( function() {
+            cj("#batch_table").on("click", ".responseLink", function() {
                 displayMessage(cj(this).attr('id'), '#responseMessage_');
             });
          } );

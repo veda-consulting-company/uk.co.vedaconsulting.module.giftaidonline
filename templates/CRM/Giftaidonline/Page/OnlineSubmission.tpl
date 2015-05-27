@@ -37,7 +37,8 @@
                                                            { "sWidth": "15%", "sType": "date" },
                                                            { "sWidth": "10%", "sType": "numeric" },
                                                            { "sWidth": "10%", "sType": "numeric" },
-                                                           { "sWidth": "20%" }
+                                                           { "sWidth": "20%" },
+                                                           { "sWidth": "15%" }
                                                          ]
                                           }
                                         );
@@ -49,6 +50,11 @@
                 } else {
                     return false;
                 }
+            });
+            cj('.errorLink').click( function() {
+                var linkId = cj(this).attr('id');
+                var messageDivHtml = cj('#errorMessage_' + linkId).html();
+                cj(messageDivHtml).dialog();
             });
          } );
 

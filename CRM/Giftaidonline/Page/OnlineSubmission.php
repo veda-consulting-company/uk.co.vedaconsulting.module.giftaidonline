@@ -302,7 +302,7 @@ EOF;
         $aEndPoint         = $p_hmrc_gift_aid->getResponseEndpoint();
         $sEndPointInterval = isset($aEndPoint['interval']) ? $aEndPoint['interval'] : null ;
         $sUrl              = CRM_Utils_System::url( 'civicrm/onlinesubmission'
-                                           , "id=$p_batch_id"
+                                           , "id=$p_batch_id&task=POLL"
                                            );
         $sRefreshLink      = sprintf( "<a href='%s'>Refresh</a>"
                              , $sUrl

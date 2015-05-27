@@ -381,6 +381,12 @@ EOD;
           $bValidDonorData = false;
           $validationMsg = "INVALID DONOR DETAILS : ADDRESS DATA ";
         }
+        // Need to check if the amount is greater than 0.00 before submitting the batch
+        $isValidAmount = $oDao->amount >= 0.01 ? true : false;
+        if ( !$isValidAmount ) {
+          $bValidDonorData = false;
+          $validationMsg = "INVALID DONOR DETAILS : AMOUNT IS LESS THAN 0.01 "; 
+        }
       } else {
         $validationMsg = "INVALID DONOR DETAILS : FIRST NAME OR LAST NAME MISSING ";
       }

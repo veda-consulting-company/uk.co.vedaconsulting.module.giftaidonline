@@ -48,6 +48,49 @@ EOF;
     return $aSubmission;
   }
 
+  private function _get_polling_request( $submission_id ) {
+    $pSql =<<<EOF
+        SELECT id
+        ,      submission_id
+        ,      created_date
+        ,      request_xml
+        ,      response_xml
+        ,      response_qualifier
+        ,      response_errors
+        ,      response_end_point
+        ,      response_end_point_interval
+        ,      response_correlation_id
+        ,      transaction_id
+        ,      gateway_timestamp
+        FROM   civicrm_gift_aid_polling_request
+        WHERE  submission_id = %1
+        ORDER BY id DESC
+EOF;
+    $pQueryParam = array(
+                          1 => array( $submission_id  , 'Integer' )
+                        );
+
+    $oDao = CRM_Core_DAO::executeQuery( $pSql, $pQueryParam );
+    if ( $oDao->fetch() ) {
+      $pRequest['id']                          = $oDao->id;
+      $pRequest['submission_id']               = $oDao->submission_id;
+      $pRequest['created_date']                = $oDao->created_date;
+      $pRequest['request_xml']                 = $oDao->request_xml;
+      $pRequest['response_xml']                = $oDao->response_xml;
+      $pRequest['response_qualifier']          = $oDao->response_qualifier;
+      $pRequest['response_errors']             = $oDao->response_errors;
+      $pRequest['response_end_point']          = $oDao->response_end_point;
+      $pRequest['response_end_point_interval'] = $oDao->response_end_point_interval;
+      $pRequest['response_correlation_id']     = $oDao->response_correlation_id;
+      $pRequest['transaction_id']              = $oDao->transaction_id;
+      $pRequest['gateway_timestamp']           = $oDao->gateway_timestamp;
+    } else {
+      $pRequest = array();
+    }
+
+    return $pRequest;
+  }
+
   private function _record_submission(
                                        $p_batch_id
                                      , $p_request_xml
@@ -398,41 +441,68 @@ EOF;
     }
 
     while ( $oDao->fetch() ) {
-      $responseErrors = '';
+      $responseErrors = $responseMessage = $sQuerySt = $linkLabel = $sUrl = '';
+      $cLink = $oDao->created_date."<br />";
       if ( !$this->is_submitted ( $oDao->batch_id ) ) {
         $sUrl  = CRM_Utils_System::url( 'civicrm/onlinesubmission'
                                       , "id=$oDao->batch_id"
                                       );
-        $cLink = sprintf( "<a href='%s'>Submit now</a>"
+        $cLink .= sprintf( "<a href='%s'>Submit now</a>"
                         , $sUrl
                         );
       } else {
         $aSubmission = $this->_get_submission( $oDao->batch_id );
+        $pRequest = $this->_get_polling_request( $aSubmission['id'] );
         // Allow resubmission of the batch, if previously reported as 'error'
         if ( $this->allow_resubmission($oDao->batch_id) ) {
           $sQueryStr = "id=$oDao->batch_id&task=RESUBMIT";
           $linkLabel = 'Re-Submit now';
 
-          $responseErrors = $aSubmission['response_errors'];
+          $responseErrors = $aSubmission['response_xml'];
         } else {
           $sQueryStr = "id=$oDao->batch_id&task=POLL";
           $linkLabel = 'Get new status';
         }
-        $sUrl  = CRM_Utils_System::url( 'civicrm/onlinesubmission'
-                                      , $sQueryStr
-                                      );
-        $cLink = sprintf( "%s<br /><a href='%s'>{$linkLabel}</a>"
-                        , $oDao->created_date
-                        , $sUrl
-                        );
+
+        if (isset($pRequest['response_qualifier']) && $pRequest['response_qualifier'] == 'response') {
+          $sQueryStr = '';
+          $linkLabel = '';
+          $responseMessage = $aSubmission['response_xml'];
+        } 
+        if (!empty($sQueryStr)) {
+          $sUrl  = CRM_Utils_System::url( 'civicrm/onlinesubmission'
+                                        , $sQueryStr
+                                        );
+          $cLink .= sprintf( "<a href='%s'>{$linkLabel}</a><br />"
+                          , $sUrl
+                          );
+        }
       }
 
       if (!empty($responseErrors)) {
-        $rLink = sprintf( "<br /><a style='cursor: pointer;' id='%s' class='errorLink'>View Failure Message</a>
+        $responseErrorObj = simplexml_load_string($responseErrors);
+        $responseErrorMsg = "Raised By:<br />".$responseErrorObj->GovTalkDetails->GovTalkErrors->Error->RaisedBy;
+        $responseErrorMsg .= "<br /><br />Number:<br />".$responseErrorObj->GovTalkDetails->GovTalkErrors->Error->Number;
+        $responseErrorMsg .= "<br /><br />Type:<br />".$responseErrorObj->GovTalkDetails->GovTalkErrors->Error->Type;
+        $responseErrorMsg .= "<br /><br />Error Text:<br />".$responseErrorObj->GovTalkDetails->GovTalkErrors->Error->Text;
+        $rLink = sprintf( "<a style='cursor: pointer;' id='errorLink_%s' class='errorLink'>View Failure Message</a>
                         <div id='errorMessage_%s' style='display: none;'><div title='Failure Message'>%s</div></div>"
                         , $oDao->batch_id
                         , $oDao->batch_id
-                        , $responseErrors
+                        , $responseErrorMsg
+                        );
+        $cLink .= $rLink;
+      }
+
+      if (!empty($responseMessage)) {
+        $responseObj = simplexml_load_string($responseMessage);
+        $responseMsg = "CorrelationID:<br />".$responseObj->Header->MessageDetails->CorrelationID;
+        $responseMsg .= "<br /><br />GatewayTimestamp:<br />".$responseObj->Header->MessageDetails->GatewayTimestamp;
+        $rLink = sprintf( "<a style='cursor: pointer;' id='responseLink_%s' class='responseLink'>View Response</a>
+                        <div id='responseMessage_%s' style='display: none;'><div title='Response Message'>%s</div></div>"
+                        , $oDao->batch_id
+                        , $oDao->batch_id
+                        , $responseMsg
                         );
         $cLink .= $rLink;
       }

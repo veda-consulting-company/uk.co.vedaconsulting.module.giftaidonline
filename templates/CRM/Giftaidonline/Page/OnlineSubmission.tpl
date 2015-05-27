@@ -52,12 +52,18 @@
                 }
             });
             cj('.errorLink').click( function() {
-                var linkId = cj(this).attr('id');
-                var messageDivHtml = cj('#errorMessage_' + linkId).html();
-                cj(messageDivHtml).dialog();
+                displayMessage(cj(this).attr('id'), '#errorMessage_');
+            });
+             cj('.responseLink').click( function() {
+                displayMessage(cj(this).attr('id'), '#responseMessage_');
             });
          } );
-
+         function displayMessage(linkId, responseId) {
+          var linkArray = linkId.split('_');
+          var linkId = linkArray[1];
+          var messageDivHtml = cj(responseId + linkId).html();
+          cj(messageDivHtml).dialog({width: '500px'});
+         }   
     </script>
     {/literal}
 {elseif $task eq 'POLLING'}

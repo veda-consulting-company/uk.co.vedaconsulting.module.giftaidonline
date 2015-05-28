@@ -1067,7 +1067,7 @@ class GovTalk {
 									//}
 									$package->writeElement('GatewayTest', $this->_govTalkTest);
                   if ( $this->_govTalkTest == 1 ) {
-  									$package->writeElement('GatewayTimestamp', date( "Y-m-d H:i:s", time() ) );
+ 									$package->writeElement('GatewayTimestamp', '' );
                   }
 								$package->endElement(); # MessageDetails
 

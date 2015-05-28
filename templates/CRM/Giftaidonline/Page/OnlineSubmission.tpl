@@ -37,7 +37,8 @@
                                                            { "sWidth": "15%", "sType": "date" },
                                                            { "sWidth": "10%", "sType": "numeric" },
                                                            { "sWidth": "10%", "sType": "numeric" },
-                                                           { "sWidth": "20%" }
+                                                           { "sWidth": "20%" },
+                                                           { "sWidth": "15%" }
                                                          ]
                                           }
                                         );
@@ -50,8 +51,19 @@
                     return false;
                 }
             });
+            cj("#batch_table").on("click", ".errorLink", function() {
+                displayMessage(cj(this).attr('id'), '#errorMessage_');
+            });
+            cj("#batch_table").on("click", ".responseLink", function() {
+                displayMessage(cj(this).attr('id'), '#responseMessage_');
+            });
          } );
-
+         function displayMessage(linkId, responseId) {
+          var linkArray = linkId.split('_');
+          var linkId = linkArray[1];
+          var messageDivHtml = cj(responseId + linkId).html();
+          cj(messageDivHtml).dialog({width: '500px'});
+         }   
     </script>
     {/literal}
 {elseif $task eq 'POLLING'}

@@ -60,6 +60,15 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
                         ),
                        
                     ),
+                    'filters'   => array(
+                        'submission_id'    => array(
+                            'title'           => 'Submission',
+                            'operatorType'    => CRM_Report_Form::OP_MULTISELECT,
+                            'options'         => CRM_Giftaidonline_Utils_Submission::getSubmissionIdTitle( 'id desc' ),
+                            'default'         => array($_GET['submissionId']),
+                            //'default'       => array(1),
+                          ),
+                    ),
                 ),
                 'civicrm_batch' => array(
                     'dao'       => 'CRM_Batch_DAO_Batch',
@@ -156,6 +165,15 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
                             'default'  => TRUE,
                             'no_repeat'=> FALSE,
                         ),
+                    ),
+                    'filters'   => array(
+                        'submission_id'    => array(
+                            'title'           => 'Submission',
+                            'operatorType'    => CRM_Report_Form::OP_MULTISELECT,
+                            'options'         => CRM_Giftaidonline_Utils_Submission::getSubmissionIdTitle( 'id desc' ),
+                            'default'         => array($_GET['submissionId']),
+                            //'default'       => array(1),
+                          ),
                     ),
                 ),
                 'civicrm_batch' => array(
@@ -281,6 +299,10 @@ class CRM_Giftaidonline_Form_Report_giftaidonlinefailure extends CRM_Report_Form
         $bId = isset($_GET['batch_id']) ? $_GET['batch_id'] : NULL ;
         if($bId){
             $this->_where = "WHERE {$this->_aliases['civicrm_batch']}.id IN (".$bId .")";
+        }
+        $submissionId = isset($_GET['submissionId']) ? $_GET['submissionId'] : NULL ;
+        if($submissionId){
+            $this->_where = "WHERE {$this->_aliases['civicrm_gift_aid_rejected_contributions']}.submission_id IN (".$submissionId.")";
         }
     }
 

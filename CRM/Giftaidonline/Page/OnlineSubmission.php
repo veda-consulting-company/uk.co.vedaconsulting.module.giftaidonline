@@ -510,7 +510,11 @@ EOF;
 
       if (!empty($responseMessage)) {
         $responseObj = simplexml_load_string($responseMessage);
-        $responseMsg = "CorrelationID:<br />".$responseObj->Header->MessageDetails->CorrelationID;
+        $responseMsg = '';
+        if (isset($responseObj->Body->SuccessResponse->IRmarkReceipt->Message)) {
+          $responseMsg .= "Message:<br />".$responseObj->Body->SuccessResponse->IRmarkReceipt->Message;
+        }
+        $responseMsg .= "<br /><br />CorrelationID:<br />".$responseObj->Header->MessageDetails->CorrelationID;
         $responseMsg .= "<br /><br />GatewayTimestamp:<br />".$responseObj->Header->MessageDetails->GatewayTimestamp;
         $rLink = sprintf( "<a style='cursor: pointer;' id='responseLink_%s' class='responseLink'>View Response</a>
                         <div id='responseMessage_%s' style='display: none;'><div title='Response Message'>%s</div></div>"

@@ -322,8 +322,9 @@ EOF;
     $oDao = CRM_Core_DAO::executeQuery( $sSql, $aQueryParam );
     if ( is_a( $oDao, 'DB_Error' ) ) {
       CRM_Core_Error::fatal( 'Trying to create a new Submission record failed.' );
-    }        
-
+    }    
+    $rejectionId = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
+    
     // Remove the contribution from the Batch
     $cEntityDelete = <<<EOD
       DELETE FROM civicrm_entity_batch
@@ -339,9 +340,10 @@ EOD;
     // hook to carry out other actions on removal of contribution from a gift aid online batch
     CRM_Giftaidonline_Utils_Hook::invalidGiftAidOnlineContribution( $batch_id, $contribution_id );
     
+    return $rejectionId;
   }
 
-  private function build_giftaid_donors_xml( $pBatchId, &$package ) {
+  private function build_giftaid_donors_xml( $pBatchId, &$package, &$rejections ) {
     $cDonorSelect = <<<EOD
       SELECT batch.id                                                  AS batch_id
       ,      batch.title                                               AS batch_name
@@ -403,7 +405,7 @@ EOD;
                           , 'gift_aid_amount' => $oDao->amount
                           );
       } else {
-        self::logBadDonorRecord( $oDao->batch_id
+        $rejections[] = self::logBadDonorRecord( $oDao->batch_id
                                , $oDao->batch_name
                                , $oDao->created_date
                                , $oDao->contribution_id
@@ -433,7 +435,7 @@ EOD;
     }
   }
 
-  private function build_claim_xml( $pBatchId, &$package ) {
+  private function build_claim_xml( $pBatchId, &$package, &$rejections ) {
     $cClaimOrgName         = $this->_Settings['CLAIMER_ORG_NAME'];
     $cClaimOrgHmrcref      = $this->_Settings['CHAR_ID'];
 //    $cClaimOrgHmrcref      = $this->_Settings['CLAIMER_ORG_HMRC_REF'];
@@ -450,7 +452,7 @@ EOD;
         $package->writeElement( 'RegNo'  , $cRegulatorNo     );
       $package->endElement(); # Regulator
       $package->startElement(   'Repayment'                  );
-        $this->build_giftaid_donors_xml( $pBatchId, $package );
+        $this->build_giftaid_donors_xml( $pBatchId, $package, $rejections );
         $package->writeElement( 'EarliestGAdate'  , '2012-01-01' );
       $package->endElement(); # Repayment
       $package->startElement(   'GASDS'                                      );
@@ -460,7 +462,7 @@ EOD;
     $package->endElement(); # Claim
   }
 
-  public function giftAidSubmit( $pBatchId ) {
+  public function giftAidSubmit( $pBatchId, &$rejections ) {
     $cChardId              = $this->_Settings['CHAR_ID'];
     //$cOrganisation         = 'HMRC';
     $cOrganisation         = 'IR';
@@ -527,7 +529,7 @@ EOD;
           $package->writeElement( 'Phone', $cAuthOffPhone );
         $package->endElement(); #AuthOfficial
         $package->writeElement( 'Declaration', $cDeclaration );
-        $this->build_claim_xml( $pBatchId, $package );
+        $this->build_claim_xml( $pBatchId, $package, $rejections );
       $package->endElement(); #R68
     $package->endElement(); #IRenvelope
 

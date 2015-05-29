@@ -87,3 +87,12 @@ v1.6.2
 
 Amended custom search to use contribution dates and not declaration dates as this is not as useful
 
+-------------------------------------------
+v1.7.0
+-------------------------------------------
+
+Added a new column to the `civicrm_gift_aid_rejected_contributions` table, in order to report rejections based on Batch Id and Submission. 
+
+Suggest if your upgrading you add this in manually
+
+ALTER TABLE `civicrm_gift_aid_rejected_contributions` ADD COLUMN `submission_id` int(10) unsigned AFTER `batch_id`;

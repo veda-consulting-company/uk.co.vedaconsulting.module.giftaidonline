@@ -223,6 +223,10 @@ EOF;
       ,        batch.created_date
       ORDER BY batch.created_date DESC;
 EOF;
+    // Hook to modify the query for selection of batches (Useful to select only giftaid batches)
+    if (empty( $batch_id )) {
+      CRM_Giftaidonline_Utils_Hook::modifySelectBatchesQuery( $sQuery );
+    }
     return $sQuery;
   }
 

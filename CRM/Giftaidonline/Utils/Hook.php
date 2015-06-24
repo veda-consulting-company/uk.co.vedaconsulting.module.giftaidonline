@@ -89,5 +89,15 @@ abstract class CRM_Giftaidonline_Utils_Hook {
 		return self::singleton( )->invoke( 2, $batchID, $contributionIDRemoved, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_invalidGiftAidOnlineContribution' );
     }
     
+    /**
+     * This hook allows modification of query for selecting batches for Online giftaid submission
+     * Example: selecting only giftaid batches for Online giftaid submission page
+     * @param $query    query for selecting batches for Online giftaid submission
+     *
+     * @access public
+     */
+    static function modifySelectBatchesQuery( &$query ) {
+        return self::singleton( )->invoke( 1, $query, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_modifySelectBatchesQuery' );
+    }
 }
 

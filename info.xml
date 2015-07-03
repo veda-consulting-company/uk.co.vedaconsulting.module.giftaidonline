@@ -14,14 +14,15 @@
     <author>Parvez Saleh</author>
     <email>support@vedaconsulting.co.uk</email>
   </maintainer>
-  <releaseDate>2015-05-28</releaseDate>
-  <version>1.7.1</version>
+  <releaseDate>2015-07-03</releaseDate>
+  <version>1.7.2</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>4.2</ver>
     <ver>4.3</ver>
     <ver>4.4</ver>
     <ver>4.5</ver>
+    <ver>4.6</ver>
   </compatibility>
   <comments>Production Release, please confirm the receipt of the submission with the HMRC</comments>
   <civix>

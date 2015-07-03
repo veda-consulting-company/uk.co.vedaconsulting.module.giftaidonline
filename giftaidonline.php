@@ -84,7 +84,5 @@ function giftaidonline_civicrm_navigationMenu( &$params ) {
  */
 function giftaidonline_civicrm_permission( &$permissions ) {
   $prefix = ts('Giftaidonline') . ': '; // name of extension or module
-  $permissions = array(
-    'allow giftaid submission' => $prefix . ts('allow giftaid submission'),
-  );
+  $permissions['allow giftaid submission'] = $prefix . ts('allow giftaid submission');
 }

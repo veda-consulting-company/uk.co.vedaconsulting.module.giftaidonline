@@ -86,14 +86,14 @@ EOD;
 
 		switch ($this->_Settings['MODE']) {
 			case 'dev':
-				parent::__construct( 'https://secure.dev.gateway.gov.uk/submission'
+				parent::__construct( 'https://test-transaction-engine.tax.service.gov.uk/submission'
                            , $govTalkSenderId
                            , $govTalkPassword
                            );
 				$this->setTestFlag( true );
                 break;
 			default:
-				parent::__construct( 'https://secure.gateway.gov.uk/submission'
+				parent::__construct( 'https://transaction-engine.tax.service.gov.uk/submission'
                            , $govTalkSenderId
                            , $govTalkPassword
                            );
